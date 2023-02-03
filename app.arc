@@ -6,7 +6,7 @@ get /
 post /AuthCenter
 
 @aws
-# profile default
+profile agape-arc-profile
 region us-west-2
 architecture arm64
 

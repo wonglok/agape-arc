@@ -1,7 +1,7 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Transform": "AWS::Serverless-2016-10-31",
-  "Description": "Exported by architect/package@8.4.0 on 2023-02-03T08:00:52.505Z",
+  "Description": "Exported by architect/package@8.4.0 on 2023-02-03T14:22:15.443Z",
   "Resources": {
     "Role": {
       "Type": "AWS::IAM::Role",
@@ -284,40 +284,14 @@
                 }
               }
             },
-            "/nonce": {
+            "/AuthCenter": {
               "post": {
                 "x-amazon-apigateway-integration": {
                   "payloadFormatVersion": "2.0",
                   "type": "aws_proxy",
                   "httpMethod": "POST",
                   "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PostNonceHTTPLambda.Arn}/invocations"
-                  },
-                  "connectionType": "INTERNET"
-                }
-              }
-            },
-            "/verify-eth-sig": {
-              "post": {
-                "x-amazon-apigateway-integration": {
-                  "payloadFormatVersion": "2.0",
-                  "type": "aws_proxy",
-                  "httpMethod": "POST",
-                  "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PostVerifyEthSigHTTPLambda.Arn}/invocations"
-                  },
-                  "connectionType": "INTERNET"
-                }
-              }
-            },
-            "/verify-jwt": {
-              "post": {
-                "x-amazon-apigateway-integration": {
-                  "payloadFormatVersion": "2.0",
-                  "type": "aws_proxy",
-                  "httpMethod": "POST",
-                  "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PostVerifyJwtHTTPLambda.Arn}/invocations"
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PostAuthCenterHTTPLambda.Arn}/invocations"
                   },
                   "connectionType": "INTERNET"
                 }
@@ -376,7 +350,10 @@
             "ARC_STATIC_BUCKET": {
               "Ref": "StaticBucket"
             },
-            "ARC_STATIC_SPA": false
+            "ARC_STATIC_SPA": false,
+            "ARC_APP_SECRET": "eyJrdHkiOiJvY3QiLCJrIjoidm9NV2oxMVhfT0xUTy1SUXpUdkQ0REFUbmwwbmpCZ25zVHBiU28tOWMtZyJ9",
+            "JWT_B64_PRIVATE": "eyJrdHkiOiJFQyIsIngiOiJtUUJrUjB1S251WDctVnlWMERyWHF3RUtGRm9mWXhKRVRDRHp6Z1oxSlFZIiwieSI6InhaLTVmV09aSkVKM0czb1ZMZUJwSXVYdnRqVmtoVGxJNUpWZEhiaVFzS2ciLCJjcnYiOiJQLTI1NiIsImQiOiJmMFFBNUdOck5RcThfVXBvV01vUFNJQTV0WkFlMzNzSzY3ODhJUzl0ZEE0In0=",
+            "JWT_B64_PUBLIC": "eyJrdHkiOiJFQyIsIngiOiJtUUJrUjB1S251WDctVnlWMERyWHF3RUtGRm9mWXhKRVRDRHp6Z1oxSlFZIiwieSI6InhaLTVmV09aSkVKM0czb1ZMZUJwSXVYdnRqVmtoVGxJNUpWZEhiaVFzS2ciLCJjcnYiOiJQLTI1NiJ9"
           }
         },
         "Role": {
@@ -409,11 +386,11 @@
         "path": "/"
       }
     },
-    "PostNonceHTTPLambda": {
+    "PostAuthCenterHTTPLambda": {
       "Type": "AWS::Serverless::Function",
       "Properties": {
         "Handler": "index.handler",
-        "CodeUri": "/Volumes/StableFiles/AutoBackup/AgapeConsumer/AgapeLand-Consumer/agape-arc/agape-arc/src/http/post-nonce",
+        "CodeUri": "/Volumes/StableFiles/AutoBackup/AgapeConsumer/AgapeLand-Consumer/agape-arc/agape-arc/src/http/post-AuthCenter",
         "Runtime": "nodejs16.x",
         "Architectures": [
           "arm64"
@@ -436,7 +413,10 @@
             },
             "ARC_STATIC_BUCKET": {
               "Ref": "StaticBucket"
-            }
+            },
+            "ARC_APP_SECRET": "eyJrdHkiOiJvY3QiLCJrIjoidm9NV2oxMVhfT0xUTy1SUXpUdkQ0REFUbmwwbmpCZ25zVHBiU28tOWMtZyJ9",
+            "JWT_B64_PRIVATE": "eyJrdHkiOiJFQyIsIngiOiJtUUJrUjB1S251WDctVnlWMERyWHF3RUtGRm9mWXhKRVRDRHp6Z1oxSlFZIiwieSI6InhaLTVmV09aSkVKM0czb1ZMZUJwSXVYdnRqVmtoVGxJNUpWZEhiaVFzS2ciLCJjcnYiOiJQLTI1NiIsImQiOiJmMFFBNUdOck5RcThfVXBvV01vUFNJQTV0WkFlMzNzSzY3ODhJUzl0ZEE0In0=",
+            "JWT_B64_PUBLIC": "eyJrdHkiOiJFQyIsIngiOiJtUUJrUjB1S251WDctVnlWMERyWHF3RUtGRm9mWXhKRVRDRHp6Z1oxSlFZIiwieSI6InhaLTVmV09aSkVKM0czb1ZMZUJwSXVYdnRqVmtoVGxJNUpWZEhiaVFzS2ciLCJjcnYiOiJQLTI1NiJ9"
           }
         },
         "Role": {
@@ -450,10 +430,10 @@
           ]
         },
         "Events": {
-          "PostNonceHTTPEvent": {
+          "PostAuthCenterHTTPEvent": {
             "Type": "HttpApi",
             "Properties": {
-              "Path": "/nonce",
+              "Path": "/AuthCenter",
               "Method": "POST",
               "ApiId": {
                 "Ref": "HTTP"
@@ -464,129 +444,9 @@
       },
       "ArcMetadata": {
         "pragma": "http",
-        "name": "post /nonce",
+        "name": "post /AuthCenter",
         "method": "post",
-        "path": "/nonce"
-      }
-    },
-    "PostVerifyEthSigHTTPLambda": {
-      "Type": "AWS::Serverless::Function",
-      "Properties": {
-        "Handler": "index.handler",
-        "CodeUri": "/Volumes/StableFiles/AutoBackup/AgapeConsumer/AgapeLand-Consumer/agape-arc/agape-arc/src/http/post-verify_eth_sig",
-        "Runtime": "nodejs16.x",
-        "Architectures": [
-          "arm64"
-        ],
-        "MemorySize": 1152,
-        "EphemeralStorage": {
-          "Size": 512
-        },
-        "Timeout": 5,
-        "Environment": {
-          "Variables": {
-            "ARC_APP_NAME": "agape-arc",
-            "ARC_ENV": "production",
-            "ARC_ROLE": {
-              "Ref": "Role"
-            },
-            "ARC_SESSION_TABLE_NAME": "jwe",
-            "ARC_STACK_NAME": {
-              "Ref": "AWS::StackName"
-            },
-            "ARC_STATIC_BUCKET": {
-              "Ref": "StaticBucket"
-            }
-          }
-        },
-        "Role": {
-          "Fn::Sub": [
-            "arn:aws:iam::${AWS::AccountId}:role/${roleName}",
-            {
-              "roleName": {
-                "Ref": "Role"
-              }
-            }
-          ]
-        },
-        "Events": {
-          "PostVerifyEthSigHTTPEvent": {
-            "Type": "HttpApi",
-            "Properties": {
-              "Path": "/verify-eth-sig",
-              "Method": "POST",
-              "ApiId": {
-                "Ref": "HTTP"
-              }
-            }
-          }
-        }
-      },
-      "ArcMetadata": {
-        "pragma": "http",
-        "name": "post /verify-eth-sig",
-        "method": "post",
-        "path": "/verify-eth-sig"
-      }
-    },
-    "PostVerifyJwtHTTPLambda": {
-      "Type": "AWS::Serverless::Function",
-      "Properties": {
-        "Handler": "index.handler",
-        "CodeUri": "/Volumes/StableFiles/AutoBackup/AgapeConsumer/AgapeLand-Consumer/agape-arc/agape-arc/src/http/post-verify_jwt",
-        "Runtime": "nodejs16.x",
-        "Architectures": [
-          "arm64"
-        ],
-        "MemorySize": 1152,
-        "EphemeralStorage": {
-          "Size": 512
-        },
-        "Timeout": 5,
-        "Environment": {
-          "Variables": {
-            "ARC_APP_NAME": "agape-arc",
-            "ARC_ENV": "production",
-            "ARC_ROLE": {
-              "Ref": "Role"
-            },
-            "ARC_SESSION_TABLE_NAME": "jwe",
-            "ARC_STACK_NAME": {
-              "Ref": "AWS::StackName"
-            },
-            "ARC_STATIC_BUCKET": {
-              "Ref": "StaticBucket"
-            }
-          }
-        },
-        "Role": {
-          "Fn::Sub": [
-            "arn:aws:iam::${AWS::AccountId}:role/${roleName}",
-            {
-              "roleName": {
-                "Ref": "Role"
-              }
-            }
-          ]
-        },
-        "Events": {
-          "PostVerifyJwtHTTPEvent": {
-            "Type": "HttpApi",
-            "Properties": {
-              "Path": "/verify-jwt",
-              "Method": "POST",
-              "ApiId": {
-                "Ref": "HTTP"
-              }
-            }
-          }
-        }
-      },
-      "ArcMetadata": {
-        "pragma": "http",
-        "name": "post /verify-jwt",
-        "method": "post",
-        "path": "/verify-jwt"
+        "path": "/AuthCenter"
       }
     },
     "TestdataTable": {
