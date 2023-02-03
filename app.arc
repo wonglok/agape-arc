@@ -20,8 +20,23 @@ folder public
 src src/shared
 
 @tables
-testdata
-  oid *String
+# testdata
+#   oid *String
 
 AppRouter
+  oid *String
+
+User
+  oid *String
+
+AuthToken
+  oid *String
+
+App
+  oid *String
+
+AppVersion
+  oid *String
+
+AppCode
   oid *String

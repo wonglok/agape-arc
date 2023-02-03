@@ -1,13 +1,35 @@
 import * as jose from "jose";
+import * as utils from "ethers";
+
+export function checkIsAddressCorrect(address) {
+  try {
+    return Boolean(utils.getAddress(address));
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
+}
+
+export function verifyMessage({ dataObject, signature }) {
+  let address = utils.verifyMessage(JSON.stringify(dataObject), signature);
+
+  if (checkIsAddressCorrect(address)) {
+    return true;
+  }
+
+  return false;
+}
+
 // let jose = require("jose");
 // let bcrypt = require("bcrypt");
-
 // let loginCode = () => {
 //   var getRAND = () => Math.random().toString(36).slice(-8);
 //   return `ONE_TIME_LOGIN_CODE_${getRAND()}_${getRAND()}`;
 // };
 
 // let yo = 123;
+
+export const getID = () => v4() + "";
 
 export const generateKeyPair = async () => {
   const appSecret = await jose.generateSecret("HS256");
@@ -40,7 +62,7 @@ export const generateKeyPair = async () => {
 };
 
 //
-export const signUserJWT = async ({ address }) => {
+export const signUserJWT = async ({ userID }) => {
   //
   let privateKeyObj = await jose.importJWK(
     JSON.parse(Buffer.from(process.env.JWT_B64_PRIVATE, "base64")),
@@ -49,7 +71,7 @@ export const signUserJWT = async ({ address }) => {
 
   //
   const jwt = await new jose.SignJWT({
-    address: `${address}`,
+    userID: `${userID}`,
   })
     .setProtectedHeader({ alg: "ES256" })
     .setIssuer("urn:metaverse:issuer")
@@ -58,8 +80,8 @@ export const signUserJWT = async ({ address }) => {
 
   //
   // console.log("sign jwt", jwt);
-
   //
+
   return { jwt };
 };
 
@@ -139,4 +161,24 @@ export const getAdminAddressMD5 = () => {
   ];
 };
 
-//
+// early return to show error
+export async function checkAdminLogin(req) {
+  // if (!req.session.accountID) {
+  //   return { statusCode: 403 };
+  // }
+
+  let notSecure = false;
+
+  if (notSecure) {
+    return {
+      cors: true,
+      statusCode: 503,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify({
+        status: "failed",
+      }),
+    };
+  }
+}
