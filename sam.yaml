@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Exported by architect/package@8.4.0 on 2023-02-03T06:40:07.526Z
+Description: Exported by architect/package@8.4.0 on 2023-02-03T08:00:52.505Z
 Resources:
   Role:
     Type: AWS::IAM::Role
@@ -56,6 +56,14 @@ Resources:
               - arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/*
               - tablename:
                   Ref: TestdataTable
+            - Fn::Sub:
+              - arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}
+              - tablename:
+                  Ref: AppRouterTable
+            - Fn::Sub:
+              - arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/*
+              - tablename:
+                  Ref: AppRouterTable
           - Effect: Deny
             Action: dynamodb:DeleteTable
             Resource:
@@ -70,6 +78,16 @@ Resources:
         - tablename: testdata
       Value:
         Ref: TestdataTable
+  AppRouterParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name:
+        Fn::Sub:
+        - /${AWS::StackName}/tables/${tablename}
+        - tablename: AppRouter
+      Value:
+        Ref: AppRouterTable
   StaticBucketParam:
     Type: AWS::SSM::Parameter
     Properties:
@@ -141,6 +159,33 @@ Resources:
                 uri:
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetIndexHTTPLambda.Arn}/invocations
                 connectionType: INTERNET
+          /nonce:
+            post:
+              x-amazon-apigateway-integration:
+                payloadFormatVersion: '2.0'
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PostNonceHTTPLambda.Arn}/invocations
+                connectionType: INTERNET
+          /verify-eth-sig:
+            post:
+              x-amazon-apigateway-integration:
+                payloadFormatVersion: '2.0'
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PostVerifyEthSigHTTPLambda.Arn}/invocations
+                connectionType: INTERNET
+          /verify-jwt:
+            post:
+              x-amazon-apigateway-integration:
+                payloadFormatVersion: '2.0'
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PostVerifyJwtHTTPLambda.Arn}/invocations
+                connectionType: INTERNET
           /_static/{proxy+}:
             get:
               x-amazon-apigateway-integration:
@@ -158,7 +203,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      CodeUri: s3://agape-arc-cfn-deployments-7ec3c/b9f653f06c55a6cfc36458b1e5bc2878
+      CodeUri: s3://agape-arc-cfn-deployments-7ec3c/77271622e98bf17598c4968ff84c4332
       Runtime: nodejs16.x
       Architectures:
       - arm64
@@ -169,7 +214,7 @@ Resources:
       Environment:
         Variables:
           ARC_APP_NAME: agape-arc
-          ARC_ENV: staging
+          ARC_ENV: production
           ARC_ROLE:
             Ref: Role
           ARC_SESSION_TABLE_NAME: jwe
@@ -196,7 +241,140 @@ Resources:
       name: get /
       method: get
       path: /
+  PostNonceHTTPLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      CodeUri: s3://agape-arc-cfn-deployments-7ec3c/6e9ab5ffd2977dcfaaffedad37111fb0
+      Runtime: nodejs16.x
+      Architectures:
+      - arm64
+      MemorySize: 1152
+      EphemeralStorage:
+        Size: 512
+      Timeout: 5
+      Environment:
+        Variables:
+          ARC_APP_NAME: agape-arc
+          ARC_ENV: production
+          ARC_ROLE:
+            Ref: Role
+          ARC_SESSION_TABLE_NAME: jwe
+          ARC_STACK_NAME:
+            Ref: AWS::StackName
+          ARC_STATIC_BUCKET:
+            Ref: StaticBucket
+      Role:
+        Fn::Sub:
+        - arn:aws:iam::${AWS::AccountId}:role/${roleName}
+        - roleName:
+            Ref: Role
+      Events:
+        PostNonceHTTPEvent:
+          Type: HttpApi
+          Properties:
+            Path: /nonce
+            Method: POST
+            ApiId:
+              Ref: HTTP
+    ArcMetadata:
+      pragma: http
+      name: post /nonce
+      method: post
+      path: /nonce
+  PostVerifyEthSigHTTPLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      CodeUri: s3://agape-arc-cfn-deployments-7ec3c/c4b9d6c4021bd1b2c72f10f67c66546a
+      Runtime: nodejs16.x
+      Architectures:
+      - arm64
+      MemorySize: 1152
+      EphemeralStorage:
+        Size: 512
+      Timeout: 5
+      Environment:
+        Variables:
+          ARC_APP_NAME: agape-arc
+          ARC_ENV: production
+          ARC_ROLE:
+            Ref: Role
+          ARC_SESSION_TABLE_NAME: jwe
+          ARC_STACK_NAME:
+            Ref: AWS::StackName
+          ARC_STATIC_BUCKET:
+            Ref: StaticBucket
+      Role:
+        Fn::Sub:
+        - arn:aws:iam::${AWS::AccountId}:role/${roleName}
+        - roleName:
+            Ref: Role
+      Events:
+        PostVerifyEthSigHTTPEvent:
+          Type: HttpApi
+          Properties:
+            Path: /verify-eth-sig
+            Method: POST
+            ApiId:
+              Ref: HTTP
+    ArcMetadata:
+      pragma: http
+      name: post /verify-eth-sig
+      method: post
+      path: /verify-eth-sig
+  PostVerifyJwtHTTPLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      CodeUri: s3://agape-arc-cfn-deployments-7ec3c/ecf8b60646d5ea94d29a6cf852d9be31
+      Runtime: nodejs16.x
+      Architectures:
+      - arm64
+      MemorySize: 1152
+      EphemeralStorage:
+        Size: 512
+      Timeout: 5
+      Environment:
+        Variables:
+          ARC_APP_NAME: agape-arc
+          ARC_ENV: production
+          ARC_ROLE:
+            Ref: Role
+          ARC_SESSION_TABLE_NAME: jwe
+          ARC_STACK_NAME:
+            Ref: AWS::StackName
+          ARC_STATIC_BUCKET:
+            Ref: StaticBucket
+      Role:
+        Fn::Sub:
+        - arn:aws:iam::${AWS::AccountId}:role/${roleName}
+        - roleName:
+            Ref: Role
+      Events:
+        PostVerifyJwtHTTPEvent:
+          Type: HttpApi
+          Properties:
+            Path: /verify-jwt
+            Method: POST
+            ApiId:
+              Ref: HTTP
+    ArcMetadata:
+      pragma: http
+      name: post /verify-jwt
+      method: post
+      path: /verify-jwt
   TestdataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+      - AttributeName: oid
+        KeyType: HASH
+      AttributeDefinitions:
+      - AttributeName: oid
+        AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+  AppRouterTable:
     Type: AWS::DynamoDB::Table
     Properties:
       KeySchema:

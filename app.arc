@@ -3,6 +3,9 @@ agape-arc
 
 @http
 get /
+post /nonce
+post /verify-eth-sig
+post /verify-jwt
 
 @aws
 # profile default
@@ -15,6 +18,12 @@ autocreate true
 @static
 folder public
 
+@shared
+
 @tables
 testdata
   oid *String
+
+AppRouter
+  oid *String
+

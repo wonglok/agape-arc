@@ -1,7 +1,7 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Transform": "AWS::Serverless-2016-10-31",
-  "Description": "Exported by architect/package@8.4.0 on 2023-02-03T06:40:07.526Z",
+  "Description": "Exported by architect/package@8.4.0 on 2023-02-03T08:00:52.505Z",
   "Resources": {
     "Role": {
       "Type": "AWS::IAM::Role",
@@ -102,6 +102,26 @@
                           }
                         }
                       ]
+                    },
+                    {
+                      "Fn::Sub": [
+                        "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}",
+                        {
+                          "tablename": {
+                            "Ref": "AppRouterTable"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "Fn::Sub": [
+                        "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/*",
+                        {
+                          "tablename": {
+                            "Ref": "AppRouterTable"
+                          }
+                        }
+                      ]
                     }
                   ]
                 },
@@ -132,6 +152,23 @@
         },
         "Value": {
           "Ref": "TestdataTable"
+        }
+      }
+    },
+    "AppRouterParam": {
+      "Type": "AWS::SSM::Parameter",
+      "Properties": {
+        "Type": "String",
+        "Name": {
+          "Fn::Sub": [
+            "/${AWS::StackName}/tables/${tablename}",
+            {
+              "tablename": "AppRouter"
+            }
+          ]
+        },
+        "Value": {
+          "Ref": "AppRouterTable"
         }
       }
     },
@@ -247,6 +284,45 @@
                 }
               }
             },
+            "/nonce": {
+              "post": {
+                "x-amazon-apigateway-integration": {
+                  "payloadFormatVersion": "2.0",
+                  "type": "aws_proxy",
+                  "httpMethod": "POST",
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PostNonceHTTPLambda.Arn}/invocations"
+                  },
+                  "connectionType": "INTERNET"
+                }
+              }
+            },
+            "/verify-eth-sig": {
+              "post": {
+                "x-amazon-apigateway-integration": {
+                  "payloadFormatVersion": "2.0",
+                  "type": "aws_proxy",
+                  "httpMethod": "POST",
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PostVerifyEthSigHTTPLambda.Arn}/invocations"
+                  },
+                  "connectionType": "INTERNET"
+                }
+              }
+            },
+            "/verify-jwt": {
+              "post": {
+                "x-amazon-apigateway-integration": {
+                  "payloadFormatVersion": "2.0",
+                  "type": "aws_proxy",
+                  "httpMethod": "POST",
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PostVerifyJwtHTTPLambda.Arn}/invocations"
+                  },
+                  "connectionType": "INTERNET"
+                }
+              }
+            },
             "/_static/{proxy+}": {
               "get": {
                 "x-amazon-apigateway-integration": {
@@ -289,7 +365,7 @@
         "Environment": {
           "Variables": {
             "ARC_APP_NAME": "agape-arc",
-            "ARC_ENV": "staging",
+            "ARC_ENV": "production",
             "ARC_ROLE": {
               "Ref": "Role"
             },
@@ -333,7 +409,205 @@
         "path": "/"
       }
     },
+    "PostNonceHTTPLambda": {
+      "Type": "AWS::Serverless::Function",
+      "Properties": {
+        "Handler": "index.handler",
+        "CodeUri": "/Volumes/StableFiles/AutoBackup/AgapeConsumer/AgapeLand-Consumer/agape-arc/agape-arc/src/http/post-nonce",
+        "Runtime": "nodejs16.x",
+        "Architectures": [
+          "arm64"
+        ],
+        "MemorySize": 1152,
+        "EphemeralStorage": {
+          "Size": 512
+        },
+        "Timeout": 5,
+        "Environment": {
+          "Variables": {
+            "ARC_APP_NAME": "agape-arc",
+            "ARC_ENV": "production",
+            "ARC_ROLE": {
+              "Ref": "Role"
+            },
+            "ARC_SESSION_TABLE_NAME": "jwe",
+            "ARC_STACK_NAME": {
+              "Ref": "AWS::StackName"
+            },
+            "ARC_STATIC_BUCKET": {
+              "Ref": "StaticBucket"
+            }
+          }
+        },
+        "Role": {
+          "Fn::Sub": [
+            "arn:aws:iam::${AWS::AccountId}:role/${roleName}",
+            {
+              "roleName": {
+                "Ref": "Role"
+              }
+            }
+          ]
+        },
+        "Events": {
+          "PostNonceHTTPEvent": {
+            "Type": "HttpApi",
+            "Properties": {
+              "Path": "/nonce",
+              "Method": "POST",
+              "ApiId": {
+                "Ref": "HTTP"
+              }
+            }
+          }
+        }
+      },
+      "ArcMetadata": {
+        "pragma": "http",
+        "name": "post /nonce",
+        "method": "post",
+        "path": "/nonce"
+      }
+    },
+    "PostVerifyEthSigHTTPLambda": {
+      "Type": "AWS::Serverless::Function",
+      "Properties": {
+        "Handler": "index.handler",
+        "CodeUri": "/Volumes/StableFiles/AutoBackup/AgapeConsumer/AgapeLand-Consumer/agape-arc/agape-arc/src/http/post-verify_eth_sig",
+        "Runtime": "nodejs16.x",
+        "Architectures": [
+          "arm64"
+        ],
+        "MemorySize": 1152,
+        "EphemeralStorage": {
+          "Size": 512
+        },
+        "Timeout": 5,
+        "Environment": {
+          "Variables": {
+            "ARC_APP_NAME": "agape-arc",
+            "ARC_ENV": "production",
+            "ARC_ROLE": {
+              "Ref": "Role"
+            },
+            "ARC_SESSION_TABLE_NAME": "jwe",
+            "ARC_STACK_NAME": {
+              "Ref": "AWS::StackName"
+            },
+            "ARC_STATIC_BUCKET": {
+              "Ref": "StaticBucket"
+            }
+          }
+        },
+        "Role": {
+          "Fn::Sub": [
+            "arn:aws:iam::${AWS::AccountId}:role/${roleName}",
+            {
+              "roleName": {
+                "Ref": "Role"
+              }
+            }
+          ]
+        },
+        "Events": {
+          "PostVerifyEthSigHTTPEvent": {
+            "Type": "HttpApi",
+            "Properties": {
+              "Path": "/verify-eth-sig",
+              "Method": "POST",
+              "ApiId": {
+                "Ref": "HTTP"
+              }
+            }
+          }
+        }
+      },
+      "ArcMetadata": {
+        "pragma": "http",
+        "name": "post /verify-eth-sig",
+        "method": "post",
+        "path": "/verify-eth-sig"
+      }
+    },
+    "PostVerifyJwtHTTPLambda": {
+      "Type": "AWS::Serverless::Function",
+      "Properties": {
+        "Handler": "index.handler",
+        "CodeUri": "/Volumes/StableFiles/AutoBackup/AgapeConsumer/AgapeLand-Consumer/agape-arc/agape-arc/src/http/post-verify_jwt",
+        "Runtime": "nodejs16.x",
+        "Architectures": [
+          "arm64"
+        ],
+        "MemorySize": 1152,
+        "EphemeralStorage": {
+          "Size": 512
+        },
+        "Timeout": 5,
+        "Environment": {
+          "Variables": {
+            "ARC_APP_NAME": "agape-arc",
+            "ARC_ENV": "production",
+            "ARC_ROLE": {
+              "Ref": "Role"
+            },
+            "ARC_SESSION_TABLE_NAME": "jwe",
+            "ARC_STACK_NAME": {
+              "Ref": "AWS::StackName"
+            },
+            "ARC_STATIC_BUCKET": {
+              "Ref": "StaticBucket"
+            }
+          }
+        },
+        "Role": {
+          "Fn::Sub": [
+            "arn:aws:iam::${AWS::AccountId}:role/${roleName}",
+            {
+              "roleName": {
+                "Ref": "Role"
+              }
+            }
+          ]
+        },
+        "Events": {
+          "PostVerifyJwtHTTPEvent": {
+            "Type": "HttpApi",
+            "Properties": {
+              "Path": "/verify-jwt",
+              "Method": "POST",
+              "ApiId": {
+                "Ref": "HTTP"
+              }
+            }
+          }
+        }
+      },
+      "ArcMetadata": {
+        "pragma": "http",
+        "name": "post /verify-jwt",
+        "method": "post",
+        "path": "/verify-jwt"
+      }
+    },
     "TestdataTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "KeySchema": [
+          {
+            "AttributeName": "oid",
+            "KeyType": "HASH"
+          }
+        ],
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "oid",
+            "AttributeType": "S"
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST"
+      }
+    },
+    "AppRouterTable": {
       "Type": "AWS::DynamoDB::Table",
       "Properties": {
         "KeySchema": [
