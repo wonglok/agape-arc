@@ -1,4 +1,5 @@
-let jose = require("jose");
+import * as jose from "jose";
+// let jose = require("jose");
 // let bcrypt = require("bcrypt");
 
 // let loginCode = () => {
@@ -6,8 +7,40 @@ let jose = require("jose");
 //   return `ONE_TIME_LOGIN_CODE_${getRAND()}_${getRAND()}`;
 // };
 
+// let yo = 123;
+
+export const generateKeyPair = async () => {
+  const appSecret = await jose.generateSecret("HS256");
+  const appSecretJwk = await jose.exportJWK(appSecret);
+  const ARC_APP_SECRET = Buffer.from(
+    JSON.stringify(appSecretJwk),
+    "utf8"
+  ).toString("base64");
+
+  const { publicKey, privateKey } = await jose.generateKeyPair("ES256");
+
+  const publicJwk = await jose.exportJWK(publicKey);
+  const privateJwk = await jose.exportJWK(privateKey);
+
+  const JWT_B64_PUBLIC = Buffer.from(
+    JSON.stringify(publicJwk),
+    "utf8"
+  ).toString("base64");
+
+  const JWT_B64_PRIVATE = Buffer.from(
+    JSON.stringify(privateJwk),
+    "utf8"
+  ).toString("base64");
+
+  return {
+    ARC_APP_SECRET,
+    JWT_B64_PRIVATE,
+    JWT_B64_PUBLIC,
+  };
+};
+
 //
-exports.signUserJWT = async ({ address }) => {
+export const signUserJWT = async ({ address }) => {
   //
   let privateKeyObj = await jose.importJWK(
     JSON.parse(Buffer.from(process.env.JWT_B64_PRIVATE, "base64")),
@@ -31,7 +64,7 @@ exports.signUserJWT = async ({ address }) => {
 };
 
 //
-exports.verifyUserJWT = async ({ jwt }) => {
+export const verifyUserJWT = async ({ jwt }) => {
   //
   let publicKeyObj = await jose.importJWK(
     JSON.parse(Buffer.from(process.env.JWT_B64_PUBLIC, "base64")),
@@ -39,10 +72,14 @@ exports.verifyUserJWT = async ({ jwt }) => {
   );
 
   //
-  const { payload, protectedHeader } = await jose.jwtVerify(jwt, publicKeyObj, {
-    issuer: "urn:metaverse:issuer",
-    audience: "urn:metaverse:audience",
-  });
+  const { payload, protectedHeader } = await jose.jwtVerify(
+    jwt + "",
+    publicKeyObj,
+    {
+      issuer: "urn:metaverse:issuer",
+      audience: "urn:metaverse:audience",
+    }
+  );
 
   //
   // console.log("payload", payload);
@@ -56,7 +93,7 @@ exports.verifyUserJWT = async ({ jwt }) => {
 };
 
 //
-exports.getPWHash = async ({ myPlaintextPassword, saltRounds = 20 }) => {
+export const getPWHash = async ({ myPlaintextPassword, saltRounds = 20 }) => {
   return new Promise((resolve, reject) => {
     // bcrypt.hash(myPlaintextPassword, saltRounds, function (err, hash) {
     //   if (err) {
@@ -69,7 +106,10 @@ exports.getPWHash = async ({ myPlaintextPassword, saltRounds = 20 }) => {
 };
 
 //
-exports.verifyPW = async ({ myPlaintextPassword, hashFromDB = "____" }) => {
+export const verifyPW = async ({
+  myPlaintextPassword,
+  hashFromDB = "____",
+}) => {
   return new Promise((resolve, reject) => {
     // bcrypt.compare(myPlaintextPassword, hashFromDB, function (err, result) {
     //   if (err) {
@@ -83,20 +123,19 @@ exports.verifyPW = async ({ myPlaintextPassword, hashFromDB = "____" }) => {
   });
 };
 
-exports.createEmailLoginSession = () => {
+export const createEmailLoginSession = () => {
   //
 };
 
-exports.verifyingLoginNumberForSession = () => {
+export const verifyingLoginNumberForSession = () => {
   //
 };
 
 //
 
-exports.getAdminAddressMD5 = () => {
+export const getAdminAddressMD5 = () => {
   return [
     //
-    "5a0aff6d6c3b3d0fc0a77c41da37b6d7", // lok
   ];
 };
 

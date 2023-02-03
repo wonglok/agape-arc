@@ -3,9 +3,7 @@ agape-arc
 
 @http
 get /
-post /nonce
-post /verify-eth-sig
-post /verify-jwt
+post /AuthCenter
 
 @aws
 # profile default
@@ -19,6 +17,7 @@ autocreate true
 folder public
 
 @shared
+src src/shared
 
 @tables
 testdata
@@ -26,4 +25,3 @@ testdata
 
 AppRouter
   oid *String
-
