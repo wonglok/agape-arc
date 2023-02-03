@@ -7,9 +7,9 @@ export async function handler(req) {
   // // create Chuck and Jana
   let chuck = await client.testdata.put({
     //
-    oid: "123" + Math.random(),
+    oid: "123",
     email: "chuck@example.com",
-    job: "Web Developer",
+    job: "Web Developer" + Math.random(),
     age: 35,
   });
 
