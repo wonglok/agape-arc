@@ -45,6 +45,9 @@ async function reply(req) {
         statusCode: 200,
         headers: {
           "Access-Control-Allow-Origin": "*",
+          "cache-control":
+            "no-cache, no-store, must-revalidate, max-age=0, s-maxage=0",
+          "content-type": "application/json; charset=utf8",
         },
         body: JSON.stringify({
           status: "ok",

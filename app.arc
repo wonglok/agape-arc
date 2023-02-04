@@ -21,9 +21,12 @@ folder static
 @shared
 src src/shared
 
+
 @tables
 # testdata
 #   oid *String
+SystemMeta
+  oid *String
 
 AppRouter
   oid *String

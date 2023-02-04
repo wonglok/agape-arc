@@ -1,9 +1,24 @@
-import * as jose from "jose";
-import * as utils from "ethers";
+import {
+  generateSecret,
+  exportJWK,
+  importJWK,
+  SignJWT,
+  jwtVerify,
+  generateKeyPair as joseGenerateKeyPair,
+} from "jose";
+import { getAddress, verifyMessage as ethersVerifyMessage } from "ethers";
+
+export function checkSystemSetup() {
+  return (
+    !!process.env.ARC_APP_SECRET &&
+    !!process.env.JWT_B64_PRIVATE &&
+    !!process.env.JWT_B64_PUBLIC
+  );
+}
 
 export function checkIsAddressCorrect(address) {
   try {
-    return Boolean(utils.getAddress(address));
+    return Boolean(getAddress(address));
   } catch (e) {
     console.error(e);
     return false;
@@ -11,7 +26,7 @@ export function checkIsAddressCorrect(address) {
 }
 
 export function verifyMessage({ rawMessage, signature }) {
-  let address = utils.verifyMessage(rawMessage, signature);
+  let address = ethersVerifyMessage(rawMessage, signature);
 
   if (checkIsAddressCorrect(address)) {
     return true;
@@ -32,17 +47,17 @@ export function verifyMessage({ rawMessage, signature }) {
 export const getID = () => v4() + "";
 
 export const generateKeyPair = async () => {
-  const appSecret = await jose.generateSecret("HS256");
-  const appSecretJwk = await jose.exportJWK(appSecret);
+  const appSecret = await generateSecret("HS256");
+  const appSecretJwk = await exportJWK(appSecret);
   const ARC_APP_SECRET = Buffer.from(
     JSON.stringify(appSecretJwk),
     "utf8"
   ).toString("base64");
 
-  const { publicKey, privateKey } = await jose.generateKeyPair("ES256");
+  const { publicKey, privateKey } = await joseGenerateKeyPair("ES256");
 
-  const publicJwk = await jose.exportJWK(publicKey);
-  const privateJwk = await jose.exportJWK(privateKey);
+  const publicJwk = await exportJWK(publicKey);
+  const privateJwk = await exportJWK(privateKey);
 
   const JWT_B64_PUBLIC = Buffer.from(
     JSON.stringify(publicJwk),
@@ -65,13 +80,13 @@ export const generateKeyPair = async () => {
 export const signUserJWT = async ({ userID }) => {
   //
 
-  let privateKeyObj = await jose.importJWK(
+  let privateKeyObj = await importJWK(
     JSON.parse(Buffer.from(process.env.JWT_B64_PRIVATE, "base64")),
     "ES256"
   );
 
   //
-  const jwt = await new jose.SignJWT({
+  const jwt = await new SignJWT({
     userID: `${userID}`,
   })
     .setProtectedHeader({ alg: "ES256" })
@@ -89,20 +104,16 @@ export const signUserJWT = async ({ userID }) => {
 //
 export const verifyUserJWT = async ({ jwt }) => {
   //
-  let publicKeyObj = await jose.importJWK(
+  let publicKeyObj = await importJWK(
     JSON.parse(Buffer.from(process.env.JWT_B64_PUBLIC, "base64")),
     "ES256"
   );
 
   //
-  const { payload, protectedHeader } = await jose.jwtVerify(
-    jwt + "",
-    publicKeyObj,
-    {
-      issuer: "urn:metaverse:issuer",
-      audience: "urn:metaverse:audience",
-    }
-  );
+  const { payload, protectedHeader } = await jwtVerify(jwt + "", publicKeyObj, {
+    issuer: "urn:metaverse:issuer",
+    audience: "urn:metaverse:audience",
+  });
 
   //
   // console.log("payload", payload);

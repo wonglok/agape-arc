@@ -94,9 +94,14 @@ export async function handler(req) {
     </style>
     <script>
 
-      async function myFunction(domID, label) {
+      async function myFunction(domID, label, el) {
+        console.log(el)
         // Get the text field
         var copyText = document.getElementById(domID);
+
+         // Select the text field
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); // For mobile devices
 
         // Copy the text inside the text field
         await navigator.clipboard.writeText(copyText.value);
@@ -111,7 +116,7 @@ export async function handler(req) {
 
     <h1>Setup Environment Variables in Terminal</h1>
     <h2>Please Backup to a safe place.</h2>
-    <h2> <button  class="button-85" role="button" onclick="myFunction('public-prod', 'JWT_B64_PUBLIC')">Copy</button></h2>
+    <h2> <button  class="button-85" role="button" onclick="myFunction('public-prod', 'JWT_B64_PUBLIC', this)">Copy</button></h2>
     <textarea id="public-prod" style="width: 500px; height: 500px; padding: 5px">
 
     arc env -e testing --add ARC_APP_SECRET ${resources.testing.ARC_APP_SECRET}
