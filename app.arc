@@ -26,6 +26,9 @@ src src/shared
 AppRouter
   oid *String
 
+AdminUser
+  oid *String
+
 User
   oid *String
 

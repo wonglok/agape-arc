@@ -2,7 +2,7 @@ import arc from "@architect/functions";
 import * as Auth from "@architect/shared/Auth.mjs";
 import ORMClass from "@architect/shared/ORMClass.mjs";
 
-export const User = new ORMClass({ collection: "User" });
+export const AdminUser = new ORMClass({ collection: "AdminUser" });
 
 async function reply(req) {
   try {
@@ -23,6 +23,11 @@ async function reply(req) {
       if (!payload.userID) {
         throw { msg: "No userID given", reason: "no-user-id" };
       }
+
+      if (payload.rawMessage.indexOf(payload.userID) === -1) {
+        throw { msg: "Unverified username", reason: "not-verified-id" };
+      }
+
       let jwt = null;
 
       if (payload.userID) {
