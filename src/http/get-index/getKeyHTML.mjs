@@ -1,9 +1,8 @@
 import Handlebars from "handlebars";
-import arc from "@architect/functions";
 import { getButtonStyle } from "./getButton.mjs";
-import fs from "fs";
-import path from "path";
 import * as Auth from "@architect/shared/Auth.mjs";
+// import arc from "@architect/functions";
+// import path from "path";
 
 export const getKeyHTML = async () => {
   let resources = {
@@ -12,7 +11,6 @@ export const getKeyHTML = async () => {
     production: await Auth.generateKeyPair(),
   };
 
-  let tailwind = fs.readFileSync(path.join("./tailwind.txt"), "utf8");
   let template = Handlebars.compile(/* html */ `
   <!DOCTYPE html>
   <html lang="en">
@@ -20,11 +18,14 @@ export const getKeyHTML = async () => {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Welcome</title>
+
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; } body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
-      ${tailwind}
     </style>
+
     <!-- <link href="{{ tailwindCSS }}" rel="stylesheet" /> -->
+
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
 
     ${getButtonStyle()}
     <script>
