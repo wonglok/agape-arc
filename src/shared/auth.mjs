@@ -10,8 +10,8 @@ export function checkIsAddressCorrect(address) {
   }
 }
 
-export function verifyMessage({ dataObject, signature }) {
-  let address = utils.verifyMessage(JSON.stringify(dataObject), signature);
+export function verifyMessage({ rawMessage, signature }) {
+  let address = utils.verifyMessage(rawMessage, signature);
 
   if (checkIsAddressCorrect(address)) {
     return true;
@@ -64,6 +64,7 @@ export const generateKeyPair = async () => {
 //
 export const signUserJWT = async ({ userID }) => {
   //
+
   let privateKeyObj = await jose.importJWK(
     JSON.parse(Buffer.from(process.env.JWT_B64_PRIVATE, "base64")),
     "ES256"

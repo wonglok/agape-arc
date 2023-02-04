@@ -3,7 +3,7 @@ agape-arc
 
 @http
 get /
-post /AuthCenter
+post /auth-center
 
 @aws
 profile agape-arc-profile

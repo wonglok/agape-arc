@@ -1,17 +1,19 @@
 import { v4 } from "uuid";
-import * as arc from "@architect/functions";
+import arc from "@architect/functions";
 // let arc = require("@architect/functions");
-import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
+import DynamoDB from "aws-sdk/clients/dynamodb.js";
+
+let { marshall, unmarshall } = DynamoDB.Converter;
 
 class ORMClass {
   constructor({ collection }) {
     this.collection = collection;
-    this.DBProm = arc.tables();
-    this.DocProm = this.DBProm.then((DB) => {
-      return DB._doc;
+    this.clientProm = arc.tables();
+    this.documentClient = this.clientProm.then((client) => {
+      return client._doc;
     });
-    this.TableProm = this.DBProm.then((DB) => {
-      return DB[this.collection];
+    this.TableProm = this.clientProm.then((client) => {
+      return client[this.collection];
     });
   }
   async create({ data }) {

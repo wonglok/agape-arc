@@ -74,6 +74,7 @@ export async function handler(req) {
   let resources = {
     // restore: await Auth.verifyUserJWT({ jwt }),
 
+    testing: await Auth.generateKeyPair(),
     staging: await Auth.generateKeyPair(),
     production: await Auth.generateKeyPair(),
   };
@@ -111,6 +112,13 @@ export async function handler(req) {
     <h2>Please Backup to a safe place.</h2>
     <h2> <button  class="button-85" role="button" onclick="myFunction('public-prod', 'JWT_B64_PUBLIC')">Copy</button></h2>
     <textarea id="public-prod" style="width: 500px; height: 500px; padding: 5px">
+
+    arc env -e testing --add ARC_APP_SECRET ${resources.testing.ARC_APP_SECRET}
+
+    arc env -e testing --add JWT_B64_PUBLIC ${resources.testing.JWT_B64_PUBLIC}
+
+    arc env -e testing --add JWT_B64_PRIVATE ${resources.testing.JWT_B64_PRIVATE}
+
     arc env -e staging --add ARC_APP_SECRET ${resources.staging.ARC_APP_SECRET}
 
     arc env -e staging --add JWT_B64_PUBLIC ${resources.staging.JWT_B64_PUBLIC}
