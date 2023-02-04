@@ -7,6 +7,11 @@ import {
   generateKeyPair as joseGenerateKeyPair,
 } from "jose";
 import { getAddress, verifyMessage as ethersVerifyMessage } from "ethers";
+import { SystemAdmins } from "./SystemAdmins-config.mjs";
+
+export function checkIsSystemAdmin({ userID }) {
+  return SystemAdmins.some((r) => r.userID === userID);
+}
 
 export function checkSystemSetup() {
   return (

@@ -11,6 +11,27 @@ async function reply(req) {
     let action = bodyData.action;
     let payload = bodyData.payload;
 
+    if (action === "verifyJWT") {
+      let { payload } = await Auth.verifyUserJWT({ jwt: payload.jwt });
+      if (!payload || !payload?.userID) {
+        throw { msg: "JWT is expired", reason: "expire-jwt" };
+      }
+
+      return {
+        cors: true,
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "cache-control":
+            "no-cache, no-store, must-revalidate, max-age=0, s-maxage=0",
+          "content-type": "application/json; charset=utf8",
+        },
+        body: JSON.stringify({
+          status: "ok",
+          userID: payload?.userID,
+        }),
+      };
+    }
     if (action === "getMetamaskJWT") {
       let isVerified = await Auth.verifyMessage({
         rawMessage: payload.rawMessage,
