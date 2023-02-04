@@ -10,7 +10,7 @@
     "stage": "npx arc deploy",
     "deploy": "npm run buildadmin; npx arc deploy --production; npm run dev",
     "postinstall": "npm run buildadmin;",
-    "buildadmin": "cd ./next-app; npm run build; cd ..; "
+    "buildadmin": "cd ./next-app; npm i; npm run build; cd ..; "
   },
   "devDependencies": {
     "@architect/architect": "^10.10.0",
