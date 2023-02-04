@@ -12,8 +12,12 @@ async function reply(req) {
     let payload = bodyData.payload;
 
     if (action === "verifyJWT") {
-      let { payload } = await Auth.verifyUserJWT({ jwt: payload.jwt });
-      if (!payload || !payload?.userID) {
+      if (!payload?.jwt) {
+        throw { msg: "No jwt given", reason: "no-jwt" };
+      }
+
+      let { payload: res } = await Auth.verifyUserJWT({ jwt: payload.jwt });
+      if (!res || !res?.userID) {
         throw { msg: "JWT is expired", reason: "expire-jwt" };
       }
 
@@ -28,7 +32,7 @@ async function reply(req) {
         },
         body: JSON.stringify({
           status: "ok",
-          userID: payload?.userID,
+          userID: res?.userID,
         }),
       };
     }
