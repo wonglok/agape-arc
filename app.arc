@@ -14,7 +14,9 @@ architecture arm64
 autocreate true
 
 @static
-folder next-app/out
+folder static
+
+@views
 
 @shared
 src src/shared

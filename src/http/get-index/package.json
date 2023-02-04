@@ -10,6 +10,7 @@
   "author": "Wong Lok",
   "license": "ISC",
   "dependencies": {
-    "@architect/functions": "^5.3.3"
+    "@architect/functions": "^5.3.3",
+    "handlebars": "^4.7.7"
   }
 }

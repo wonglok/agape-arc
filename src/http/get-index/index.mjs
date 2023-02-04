@@ -1,4 +1,26 @@
+import Handlebars from "handlebars";
+import arc from "@architect/functions";
 export async function handler(req) {
+  const template = Handlebars.compile(/* html */ `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>Welcome</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; } body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+      </style>
+      <script src=${arc.static("/index.js")}></script>
+    </head>
+      <body class="" style="padding: 20px">
+        <h1 style="margin-bottom: 15px;">Welcome! {{ name }}</h1>
+      </body>
+    </html>
+  `);
+
+  let html = template({ name: "Nils" });
+
   return {
     cors: true,
     statusCode: 200,
@@ -9,23 +31,7 @@ export async function handler(req) {
         "no-cache, no-store, must-revalidate, max-age=0, s-maxage=0",
       "content-type": "text/html; charset=utf8",
     },
-    body: /* html */ `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-      <title>Welcome</title>
-      <style>
-         * { margin: 0; padding: 0; box-sizing: border-box; } body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
-      </style>
-    </head>
-      <body class="" style="padding: 20px">
-        <h1 style="margin-bottom: 15px;">Welcome!</h1>
-
-      </body>
-    </html>
-  `,
+    body: html,
   };
 }
 
