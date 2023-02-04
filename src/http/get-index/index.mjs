@@ -1,6 +1,7 @@
 import Handlebars from "handlebars";
 import arc from "@architect/functions";
 export async function handler(req) {
+  //
   const template = Handlebars.compile(/* html */ `
     <!DOCTYPE html>
     <html lang="en">
@@ -11,7 +12,7 @@ export async function handler(req) {
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; } body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
       </style>
-      <script src=${arc.static("/index.js")}></script>
+      <script src="{{ src }}"></script>
     </head>
       <body class="" style="padding: 20px">
         <h1 style="margin-bottom: 15px;">Welcome! {{ name }}</h1>
@@ -19,7 +20,7 @@ export async function handler(req) {
     </html>
   `);
 
-  let html = template({ name: "Nils" });
+  let html = template({ name: "Nils", src: `${arc.static("/index.js")}` });
 
   return {
     cors: true,
