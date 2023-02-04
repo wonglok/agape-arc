@@ -1,6 +1,5 @@
 import { v4 } from "uuid";
 import arc from "@architect/functions";
-// let arc = require("@architect/functions");
 import DynamoDB from "aws-sdk/clients/dynamodb.js";
 
 let { marshall, unmarshall } = DynamoDB.Converter;

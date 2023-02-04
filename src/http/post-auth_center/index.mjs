@@ -20,6 +20,7 @@ async function reply(req) {
       if (!isVerified) {
         throw { msg: "Signature Didn't match", reason: "signature-not-match" };
       }
+
       if (!payload.userID) {
         throw { msg: "No userID given", reason: "no-user-id" };
       }

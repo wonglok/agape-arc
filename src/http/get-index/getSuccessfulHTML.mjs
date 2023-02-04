@@ -14,7 +14,6 @@ export const getSuccessfulHTML = async () => {
       * { margin: 0; padding: 0; box-sizing: border-box; } body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
     </style>
     <link href="{{ tailwindCSS }}" rel="stylesheet" />
-    <script src="{{ axios }}"></script>
 
     ${getButtonStyle()}
 
