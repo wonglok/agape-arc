@@ -1,6 +1,6 @@
 // import arc from "@architect/functions";
 import { getOOBEHTML } from "./getOOBEHTML.mjs";
-import { getThankyouHTML } from "./getThankyouHTML.mjs";
+import { getSuccessfulHTML } from "./getSuccessfulHTML.mjs";
 import { checkSystemSetup } from "@architect/shared/Auth.mjs";
 export async function handler(req) {
   let allSetupDone = checkSystemSetup();
@@ -16,7 +16,7 @@ export async function handler(req) {
           "no-cache, no-store, must-revalidate, max-age=0, s-maxage=0",
         "content-type": "text/html; charset=utf8",
       },
-      body: await getThankyouHTML(),
+      body: await getSuccessfulHTML(),
     };
   } else {
     return {

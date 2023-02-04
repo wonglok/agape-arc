@@ -2,8 +2,8 @@ import Handlebars from "handlebars";
 import arc from "@architect/functions";
 import { getButtonStyle } from "./getButton.mjs";
 
-export const getThankyouHTML = async () => {
-  let templateForOOBE = Handlebars.compile(/* html */ `
+export const getSuccessfulHTML = async () => {
+  let templateEngine = Handlebars.compile(/* html */ `
   <!DOCTYPE html>
   <html lang="en">
   <head>
@@ -26,7 +26,7 @@ export const getThankyouHTML = async () => {
   </html>
 `);
 
-  let html = templateForOOBE({
+  let html = templateEngine({
     tailwindCSS: `${arc.static("/common/tailwind.min.css")}`,
   });
   return html;
