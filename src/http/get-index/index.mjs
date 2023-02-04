@@ -1,4 +1,4 @@
-import * as Auth from "@architect/shared/auth.mjs";
+import * as Auth from "@architect/shared/Auth.mjs";
 // import arc from "@architect/functions";
 
 let style = ` <style>
