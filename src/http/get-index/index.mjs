@@ -70,6 +70,7 @@ let style = ` <style>
 }
 
   </style>`;
+
 export async function handler(req) {
   let resources = {
     // restore: await Auth.verifyUserJWT({ jwt }),
@@ -141,7 +142,7 @@ export async function handler(req) {
   let base64data =
     `data:text/html;charset=utf-8;base64,` + buff.toString("base64");
 
-  console.log("running");
+  // console.log("running");
   return {
     cors: true,
     statusCode: 200,
@@ -171,7 +172,7 @@ export async function handler(req) {
 
       </body>
     </html>
-`,
+  `,
   };
 }
 
