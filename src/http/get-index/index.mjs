@@ -1,11 +1,8 @@
-import arc from "@architect/functions";
+// import arc from "@architect/functions";
 import { getOOBEHTML } from "./getOOBEHTML.mjs";
-import { getKeyHTML } from "./getKeyHTML.mjs";
 import { getThankyouHTML } from "./getThankyouHTML.mjs";
 import { checkSystemSetup } from "@architect/shared/Auth.mjs";
 export async function handler(req) {
-  //
-
   let allSetupDone = checkSystemSetup();
 
   if (allSetupDone) {
@@ -13,8 +10,8 @@ export async function handler(req) {
       cors: true,
       statusCode: 200,
       headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": true,
+        // "Access-Control-Allow-Origin": "*",
+        // "Access-Control-Allow-Credentials": true,
         "cache-control":
           "no-cache, no-store, must-revalidate, max-age=0, s-maxage=0",
         "content-type": "text/html; charset=utf8",
@@ -26,14 +23,12 @@ export async function handler(req) {
       cors: true,
       statusCode: 200,
       headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": true,
+        // "Access-Control-Allow-Origin": "*",
+        // "Access-Control-Allow-Credentials": true,
         "cache-control":
           "no-cache, no-store, must-revalidate, max-age=0, s-maxage=0",
         "content-type": "text/html; charset=utf8",
       },
-
-      // body: ,
 
       body: await getOOBEHTML(),
     };
