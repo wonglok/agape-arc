@@ -126,7 +126,7 @@ export const verifyUserJWT = async ({ jwt }) => {
   //
 
   return {
-    payload,
+    userInfo: payload,
     protectedHeader,
   };
 };

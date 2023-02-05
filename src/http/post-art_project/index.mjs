@@ -1,50 +1,88 @@
-// learn more about HTTP functions here: https://arc.codes/http
-export async function handler(req) {
-  return {
-    statusCode: 200,
-    headers: {
-      "cache-control":
-        "no-cache, no-store, must-revalidate, max-age=0, s-maxage=0",
-      "content-type": "text/html; charset=utf8",
-    },
-    body: `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Architect</title>
-  <style>
-     * { margin: 0; padding: 0; box-sizing: border-box; } body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; } .max-width-320 { max-width: 20rem; } .margin-left-8 { margin-left: 0.5rem; } .margin-bottom-16 { margin-bottom: 1rem; } .margin-bottom-8 { margin-bottom: 0.5rem; } .padding-32 { padding: 2rem; } .color-grey { color: #333; } .color-black-link:hover { color: black; }
-  </style>
-</head>
-<body class="padding-32">
-  <div class="max-width-320">
-    <img src="https://assets.arc.codes/logo.svg" />
-    <div class="margin-left-8">
-      <div class="margin-bottom-16">
-        <h1 class="margin-bottom-16">
-          Hello from an Architect Node.js function!
-        </h1>
-        <p class="margin-bottom-8">
-          Get started by editing this file at:
-        </p>
-        <code>
-          src/http/post-art_project/index.mjs
-        </code>
-      </div>
-      <div>
-        <p class="margin-bottom-8">
-          View documentation at:
-        </p>
-        <code>
-          <a class="color-grey color-black-link" href="https://arc.codes">https://arc.codes</a>
-        </code>
-      </div>
-    </div>
-  </div>
-</body>
-</html>
-`,
-  };
+import arc from "@architect/functions";
+import * as Auth from "@architect/shared/Auth.mjs";
+import ORMClass from "@architect/shared/ORMClass.mjs";
+import { SystemAdmins } from "@architect/shared/SystemAdmins-config.mjs";
+
+export const ArtProject = new ORMClass({ collection: "ArtProject" });
+
+async function reply(req) {
+  try {
+    //
+    let bodyData = JSON.parse(req.body);
+    let action = bodyData.action;
+    let payload = bodyData.payload;
+
+    // middleware
+    if (!payload?.jwt) {
+      throw { msg: "No jwt given", reason: "no-jwt" };
+    }
+
+    let { userInfo } = await Auth.verifyUserJWT({ jwt: payload.jwt });
+    if (!userInfo || !userInfo?.userID) {
+      throw { msg: "JWT is expired", reason: "expire-jwt" };
+    }
+
+    if (!SystemAdmins.some((e) => e.userID === userInfo?.userID)) {
+      throw {
+        msg: "Require System Admin Access Rights",
+        reason: "no-access-right",
+      };
+    }
+
+    if (action === "create") {
+      let result = await ArtProject.create({
+        data: {
+          ...(payload || {}),
+
+          createdAt: new Date().getTime(),
+          createdBy: userInfo.userID,
+          updatedBy: userInfo.userID,
+          oid: Auth.getID(),
+        },
+      });
+
+      return {
+        cors: true,
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "cache-control":
+            "no-cache, no-store, must-revalidate, max-age=0, s-maxage=0",
+          "content-type": "application/json; charset=utf8",
+        },
+        body: JSON.stringify({
+          status: "ok",
+          result: result,
+        }),
+      };
+    }
+
+    throw { msg: "no action provided", reason: "no-action-name" };
+  } catch (e) {
+    console.error(e?.message);
+    let msg = "";
+    let reason = "";
+
+    if (e.msg) {
+      msg = e.msg;
+    }
+    if (e.reason) {
+      reason = e.reason;
+    }
+
+    return {
+      cors: true,
+      statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify({
+        status: "bad",
+        msg,
+        reason,
+      }),
+    };
+  }
 }
+
+export const handler = arc.http.async(reply);
