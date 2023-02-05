@@ -21,13 +21,21 @@ class ORMClass {
 
     return createdItem;
   }
-  async remove({ data }) {
+  async remove({ oid }) {
     let Table = await this.TableProm;
-    let removedItem = await Table.delete(data);
+    let removedItem = await Table.delete({ oid });
 
     return removedItem;
   }
-  async list({
+
+  async listAll({}) {
+    let Table = await this.TableProm;
+    let result = await Table.scan({});
+
+    return result;
+  }
+
+  async filter({
     FilterExpression = "age >= :givenAge",
     ExpressionAttributeValues = { ":givenAge": 3 },
   }) {

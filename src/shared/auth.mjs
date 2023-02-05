@@ -6,6 +6,7 @@ import {
   jwtVerify,
   generateKeyPair as joseGenerateKeyPair,
 } from "jose";
+import { v4 } from "uuid";
 import { getAddress, verifyMessage as ethersVerifyMessage } from "ethers";
 import { SystemAdmins } from "./SystemAdmins-config.mjs";
 

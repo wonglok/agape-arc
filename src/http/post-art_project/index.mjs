@@ -9,15 +9,16 @@ async function reply(req) {
   try {
     //
     let bodyData = JSON.parse(req.body);
+    let jwt = bodyData.jwt;
     let action = bodyData.action;
     let payload = bodyData.payload;
 
     // middleware
-    if (!payload?.jwt) {
+    if (!jwt) {
       throw { msg: "No jwt given", reason: "no-jwt" };
     }
 
-    let { userInfo } = await Auth.verifyUserJWT({ jwt: payload.jwt });
+    let { userInfo } = await Auth.verifyUserJWT({ jwt: jwt });
     if (!userInfo || !userInfo?.userID) {
       throw { msg: "JWT is expired", reason: "expire-jwt" };
     }
@@ -53,6 +54,65 @@ async function reply(req) {
         body: JSON.stringify({
           status: "ok",
           result: result,
+        }),
+      };
+    }
+
+    if (action === "listAll") {
+      let result = await ArtProject.listAll({});
+
+      return {
+        cors: true,
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "cache-control":
+            "no-cache, no-store, must-revalidate, max-age=0, s-maxage=0",
+          "content-type": "application/json; charset=utf8",
+        },
+        body: JSON.stringify({
+          status: "ok",
+          result: result?.Items || [],
+        }),
+      };
+    }
+
+    if (action === "remove") {
+      let result = await ArtProject.remove({ oid: payload.oid });
+
+      console.log(result);
+      return {
+        cors: true,
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "cache-control":
+            "no-cache, no-store, must-revalidate, max-age=0, s-maxage=0",
+          "content-type": "application/json; charset=utf8",
+        },
+        body: JSON.stringify({
+          status: "ok",
+          result,
+        }),
+      };
+    }
+
+    if (action === "update") {
+      let result = await ArtProject.update({ data: payload });
+
+      console.log(result);
+      return {
+        cors: true,
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "cache-control":
+            "no-cache, no-store, must-revalidate, max-age=0, s-maxage=0",
+          "content-type": "application/json; charset=utf8",
+        },
+        body: JSON.stringify({
+          status: "ok",
+          result,
         }),
       };
     }
