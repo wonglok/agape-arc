@@ -97,6 +97,26 @@ async function reply(req) {
       };
     }
 
+    if (action === "get") {
+      let result = await ArtProject.get({ oid: payload.oid });
+
+      console.log(result);
+      return {
+        cors: true,
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "cache-control":
+            "no-cache, no-store, must-revalidate, max-age=0, s-maxage=0",
+          "content-type": "application/json; charset=utf8",
+        },
+        body: JSON.stringify({
+          status: "ok",
+          result,
+        }),
+      };
+    }
+
     if (action === "update") {
       let result = await ArtProject.update({ data: payload });
 

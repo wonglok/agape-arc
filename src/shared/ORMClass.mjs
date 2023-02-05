@@ -23,7 +23,7 @@ class ORMClass {
   }
   async remove({ oid }) {
     let Table = await this.TableProm;
-    let removedItem = await Table.delete({ oid });
+    let removedItem = await Table.delete({ oid: oid });
 
     return removedItem;
   }
@@ -78,11 +78,9 @@ class ORMClass {
     return res;
   }
 
-  async get({ keyName, keyValue }) {
+  async get(param) {
     let Table = await this.TableProm;
-    let queryResult = await Table.get({
-      [keyName]: keyValue,
-    });
+    let queryResult = await Table.get(param);
 
     return queryResult;
   }
