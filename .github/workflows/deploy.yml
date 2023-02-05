@@ -4,12 +4,12 @@ name: Build and deploy
 on: [push, pull_request]
 
 jobs:
-  # # Build and test
-  # build:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Build App
-  #       uses: architect/action-build@v3
+  # Build and test
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build App
+        uses: architect/action-build@v3
 
   # Deploy main branch to staging and git tags to production
   deploy:
