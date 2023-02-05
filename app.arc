@@ -10,7 +10,7 @@ post /app-version
 post /art-project
 
 @aws
-profile agape-arc-profile
+# profile agape-arc-profile
 region us-west-2
 architecture arm64
 
