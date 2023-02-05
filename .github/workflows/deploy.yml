@@ -1,47 +1,44 @@
-# ./.github/workflows/deploy.yml
-name: Deploy
+name: "Architect Deploy"
+description: "Deploys an Architect app to AWS"
+runs:
+  using: "composite"
+  steps:
+    - name: Cancel previous runs
+      uses: styfle/cancel-workflow-action@0.11.0
 
-on:
-  push:
-    branches:
-      - master
-      - main
-  pull_request: {}
+    - name: Check out repo
+      uses: actions/checkout@v3
 
-jobs:
-  deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cancel previous runs
-        uses: styfle/cancel-workflow-action@0.11.0
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 14
-      - name: Env report
-        run: |
-          echo "Event name: ${{ github.event_name }}"
-          echo "Git ref:    ${{ github.ref }}"
-          echo "GH actor:   ${{ github.actor }}"
-          echo "SHA:        ${{ github.sha }}"
-          VER=`node --version`; echo "Node ver:   $VER"
-          VER=`npm --version`; echo "npm ver:    $VER"
-      - name: Install dependencies
-        uses: bahmutov/npm-install@v1
-      - name: Arc hydrate
-        run: npx arc hydrate
-      - name: Staging deploy
-        if: github.ref == 'refs/heads/master'
-        run: npx arc deploy --staging -v --prune
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: Production deploy
-        if: github.ref == 'refs/heads/main'
-        run: npx arc deploy --production -v --prune
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 14
+
+    - name: Install dependencies
+      uses: bahmutov/npm-install@v1
+      with:
+        useLockFile: true
+
+    - name: Install Architect
+      shell: bash
+      run: npm install @architect/architect
+
+    - name: Vendor dist files
+      shell: bash
+      run: npm run dist --if-present
+
+    - name: Staging Deploy
+      if: github.ref == 'refs/heads/master'
+      shell: bash
+      run: npx arc deploy --staging
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
+
+    - name: Production Deploy
+      if: startsWith(github.ref, 'refs/tags/v')
+      shell: bash
+      run: npx arc deploy --production
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
