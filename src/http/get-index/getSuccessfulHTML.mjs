@@ -21,6 +21,7 @@ export const getSuccessfulHTML = async () => {
     <body class="p-8" style="">
       <h1 class="text-3xl mb-0 "> <span class="font-mono">AGĀPÉ</span> is Successfully Setup 🥳 </h1>
       <div class="text-lg mb-3 text-gray-500">Thank you for using AGAPE.</div>
+      <div>See you around 🥰</div>
     </body>
   </html>
 `);
