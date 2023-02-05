@@ -50,7 +50,7 @@ export function verifyMessage({ rawMessage, signature }) {
 
 // let yo = 123;
 
-export const getID = () => v4() + "";
+export const getID = () => "_" + v4() + "";
 
 export const generateKeyPair = async () => {
   const appSecret = await generateSecret("HS256");
