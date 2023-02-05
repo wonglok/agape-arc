@@ -9,7 +9,7 @@
     "ext": "ARC_DB_EXTERNAL=true ARC_TABLES_PORT=5001 npx arc sandbox",
     "stage": "npx arc deploy",
     "deploy": "npx arc deploy --production; npm run dev",
-    "dist": "yarn; npx arc init; npx arc hydrate;"
+    "dist": "yarn; npx arc init; npx arc hydrate; npx arc deploy --production;"
   },
   "devDependencies": {
     "@architect/architect": "^10.10.0",
