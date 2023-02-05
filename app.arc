@@ -4,7 +4,7 @@ agape-arc
 @http
 get /
 post /auth-center
-post /App
+post /art-project
 
 @aws
 profile agape-arc-profile
