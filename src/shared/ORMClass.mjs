@@ -21,9 +21,9 @@ class ORMClass {
 
     return createdItem;
   }
-  async remove({ oid }) {
+  async remove(params) {
     let Table = await this.TableProm;
-    let removedItem = await Table.delete({ oid: oid });
+    let removedItem = await Table.delete(params);
 
     return removedItem;
   }
