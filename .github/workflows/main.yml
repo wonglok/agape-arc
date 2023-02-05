@@ -10,7 +10,10 @@ jobs:
     steps:
       - name: Build App
         uses: architect/action-build@v3
-
+        with:
+          aws_access_key_id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws_secret_access_key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          
   # Deploy main branch to staging and git tags to production
   deploy:
     needs: build
