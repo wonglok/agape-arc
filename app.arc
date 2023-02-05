@@ -5,6 +5,8 @@ agape-arc
 get /
 post /auth-center
 post /app-project
+post /app-version
+
 post /art-project
 
 @aws
