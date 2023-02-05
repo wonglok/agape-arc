@@ -4,6 +4,7 @@ agape-arc
 @http
 get /
 post /auth-center
+post /App
 
 @aws
 profile agape-arc-profile
@@ -40,11 +41,14 @@ User
 AuthToken
   oid *String
 
-App
+AppProject
   oid *String
 
 AppVersion
   oid *String
 
 AppCode
+  oid *String
+
+ArtProject
   oid *String
