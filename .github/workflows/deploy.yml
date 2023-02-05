@@ -1,9 +1,7 @@
-# .github/workflows/buid-deploy.yml
+# .github/workflows/build-deploy.yml
 name: Build and deploy
 
 on: [push, pull_request]
-
-#
 
 jobs:
   # Build and test
@@ -16,50 +14,12 @@ jobs:
   # Deploy main branch to staging and git tags to production
   deploy:
     needs: build
-    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
 
     steps:
       - name: Deploy app
-        uses: composite
-
-        steps:
-          - name: Cancel previous runs
-            uses: styfle/cancel-workflow-action@0.11.0
-
-          - name: Check out repo
-            uses: actions/checkout@v3
-
-          - name: Set up Node.js
-            uses: actions/setup-node@v3
-            with:
-              node-version: 14
-
-          - name: Install dependencies
-            uses: bahmutov/npm-install@v1
-            with:
-              useLockFile: true
-
-          - name: Install Architect
-            shell: bash
-            run: npm install @architect/architect
-
-          - name: Vendor dist files
-            shell: bash
-            run: npm run dist --if-present
-
-          - name: Staging Deploy
-            if: github.ref == 'refs/heads/master'
-            shell: bash
-            run: npx arc deploy --staging
-            env:
-              AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
-              AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
-
-          - name: Production Deploy
-            if: startsWith(github.ref, 'refs/tags/v')
-            shell: bash
-            run: npx arc deploy --production
-            env:
-              AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
-              AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
+        uses: architect/action-deploy@v1
+        with:
+          aws_access_key_id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws_secret_access_key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
