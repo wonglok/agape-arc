@@ -15,5 +15,6 @@
     "@architect/architect": "^10.10.0",
     "concurrently": "^7.6.0",
     "dynalite": "^3.2.2"
-  }
+  },
+  "dependencies": {}
 }

@@ -14,6 +14,8 @@ profile agape-arc-profile
 region us-west-2
 architecture arm64
 
+@ws
+
 @create
 autocreate true
 
@@ -24,7 +26,6 @@ folder static
 
 @shared
 src src/shared
-
 
 @tables
 # testdata
@@ -55,3 +56,6 @@ AppCode
 
 ArtProject
   oid *String
+
+YConnectionsTable
+  PartitionKey *string
