@@ -37,7 +37,7 @@ export async function handler(req) {
       });
   };
 
-  console.log(req.body);
+  // console.log(req.body);
   await ysockets.onMessage(connectionId, req.body, send);
 
   return { statusCode: 200 };
