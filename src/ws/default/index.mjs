@@ -29,11 +29,8 @@ export async function handler(req) {
       })
       .catch((r) => {
         console.error("send error", r);
-        client.YConnectionsTable.delete({ PartitionKey: connectionId }).then(
-          (r) => {
-            console.log(r);
-          }
-        );
+
+        ysockets.onDisconnect(connectionId);
       });
   };
 

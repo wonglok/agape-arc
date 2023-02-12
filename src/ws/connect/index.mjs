@@ -6,9 +6,10 @@ import arc from "@architect/functions";
 export async function handler(req) {
   //
 
-  console.log(
-    JSON.stringify(req.queryStringParameters.documentName, null, "  ")
-  );
+  // console.log(
+  //   JSON.stringify(req.queryStringParameters.documentName, null, "  ")
+  // );
+
   let client = await arc.tables();
   let documentClient = client._doc;
 
