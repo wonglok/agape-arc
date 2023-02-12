@@ -12,11 +12,12 @@ export async function handler(req) {
   // console.log(JSON.stringify(req, null, 2));
 
   let client = await arc.tables();
-  let documentClient = client._doc;
+  let YConn = await client.YConn;
+  let YData = await client.YData;
 
   const ysockets = new YSockets({
-    documentClient,
-    tableName: client.name(`YConnectionsTable`),
+    YConn,
+    YData,
   });
 
   let connectionId = req.requestContext.connectionId;
@@ -33,9 +34,10 @@ export async function handler(req) {
         ysockets.onDisconnect(connectionId);
       });
   };
-
   // console.log(req.body);
-  await ysockets.onMessage(connectionId, req.body, send);
+
+  let conn = await YConn.get({ oid: connectionId });
+  await ysockets.onMessage(connectionId, conn.roomName, req.body, send);
 
   return { statusCode: 200 };
 }

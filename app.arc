@@ -59,3 +59,9 @@ ArtProject
 
 YConnectionsTable
   PartitionKey *string
+
+YConn
+  oid *string
+
+YData
+  oid *string
