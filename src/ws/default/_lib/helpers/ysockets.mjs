@@ -29,6 +29,9 @@ export class YSockets {
   async onMessage(connectionId, b64Message, send) {
     const { ct } = this;
     let messageArray = fromBase64(b64Message);
+
+    // console.log(messageArray);
+
     const docName = (await ct.getConnection(connectionId)).DocName;
     const connectionIds = await ct.getConnectionIds(docName);
     const otherConnectionIds = connectionIds.filter(
