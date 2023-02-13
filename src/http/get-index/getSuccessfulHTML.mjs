@@ -26,6 +26,8 @@ export const getSuccessfulHTML = async () => {
   </html>
 `);
 
+  //
+
   let html = templateEngine({
     tailwindCSS: `${arc.static("/common/tailwind.min.css")}`,
   });

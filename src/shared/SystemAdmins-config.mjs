@@ -9,7 +9,12 @@ export const SystemAdmins = [
     type: "metamask",
     userID: "0xeCB732CffbF1d34d9eEF4aB09ddF5237593deD19",
   },
-  //
+
+  {
+    name: "admin",
+    type: "password",
+    userID: "admin",
+  },
 
   //
 ];

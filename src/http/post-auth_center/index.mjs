@@ -84,6 +84,52 @@ async function reply(req) {
       };
     }
 
+    if (action === "getAdminJWT") {
+      let isVerified = false;
+      if (
+        process.env.ADMIN_PW === payload.password &&
+        payload.userID === "admin"
+      ) {
+        isVerified = true;
+      }
+
+      if (!isVerified) {
+        throw { msg: "Signature Didn't match", reason: "signature-not-match" };
+      }
+
+      if (!payload.userID) {
+        throw { msg: "No userID given", reason: "no-user-id" };
+      }
+
+      let jwt = null;
+
+      if (payload.userID) {
+        let result = await Auth.signUserJWT({
+          userID: payload.userID,
+        });
+        jwt = result.jwt;
+      }
+
+      if (jwt === null || !jwt) {
+        throw { msg: "No JWT Generated", reason: "no-jwt" };
+      }
+
+      return {
+        cors: true,
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "cache-control":
+            "no-cache, no-store, must-revalidate, max-age=0, s-maxage=0",
+          "content-type": "application/json; charset=utf8",
+        },
+        body: JSON.stringify({
+          status: "ok",
+          jwt,
+        }),
+      };
+    }
+
     throw { msg: "no action provided", reason: "no-action-name" };
   } catch (e) {
     console.error(e?.message);
