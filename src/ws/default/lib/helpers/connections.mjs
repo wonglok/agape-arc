@@ -82,6 +82,7 @@ export class ConnectionsTableHelper {
   }
   async updateDoc(docName, update) {
     console.log(update);
+
     return await this.DatabaseHelper.updateItemAttribute(
       docName,
       "Updates",
