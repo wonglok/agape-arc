@@ -1,8 +1,6 @@
 import { DDBHelper } from "../utils/ddb.mjs";
 import * as Y from "yjs";
 import arc from "@architect/functions";
-import { v4 as uuidv4 } from "uuid";
-
 export class ConnectionsTableHelper {
   constructor({ documentClient, tableName }) {
     this.DatabaseHelper = new DDBHelper({
@@ -59,30 +57,15 @@ export class ConnectionsTableHelper {
     return [];
   }
   async getOrCreateDoc(docName) {
-    // const existingDoc = await this.DatabaseHelper.getItem(docName);
-    // let dbDoc = {
-    //   Updates: [],
-    // };
-    // if (existingDoc) {
-    //   dbDoc = existingDoc;
-    // } else {
-    //   await this.DatabaseHelper.createItem(docName, dbDoc, undefined, true);
-    // }
-
-    let client = await arc.tables();
-    let resultsDeltas = await client.YDeltaTable.scan({
-      FilterExpression: `docName = :dd`,
-      ExpressionAttributeValues: {
-        [":dd"]: docName,
-      },
-    });
-
-    console.log(resultsDeltas.Count, "resultsDeltas");
-
+    const existingDoc = await this.DatabaseHelper.getItem(docName);
     let dbDoc = {
-      Updates: resultsDeltas.Items.map((r) => r.update),
+      Updates: [],
     };
-
+    if (existingDoc) {
+      dbDoc = existingDoc;
+    } else {
+      await this.DatabaseHelper.createItem(docName, dbDoc, undefined, true);
+    }
     // convert updates to an encoded array
     const updates = dbDoc.Updates.map(
       (update) => new Uint8Array(Buffer.from(update, "base64"))
@@ -98,23 +81,14 @@ export class ConnectionsTableHelper {
     return ydoc;
   }
   async updateDoc(docName, update) {
-    let client = await arc.tables();
-
-    await client.YDeltaTable.put({
-      oid: uuidv4(),
-      docName: docName,
-      update: update,
-      ts: new Date().getTime(),
-    });
-
-    // console.log(update);
-    // return await this.DatabaseHelper.updateItemAttribute(
-    //   docName,
-    //   "Updates",
-    //   [update],
-    //   undefined,
-    //   { appendToList: true }
-    // );
+    console.log(update);
+    return await this.DatabaseHelper.updateItemAttribute(
+      docName,
+      "Updates",
+      [update],
+      undefined,
+      { appendToList: true }
+    );
     /*
         Future: Try to compute diffs as one large update
 
