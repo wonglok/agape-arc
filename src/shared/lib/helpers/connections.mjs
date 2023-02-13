@@ -92,7 +92,7 @@ export class ConnectionsTableHelper {
       try {
         Y.applyUpdate(ydoc, update);
       } catch (ex) {
-        console.log("Something went wrong with applying the update");
+        console.log("Something went wrong with applying the update", ex);
       }
     }
     return ydoc;
