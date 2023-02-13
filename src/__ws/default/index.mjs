@@ -5,21 +5,11 @@
 // }
 // learn more about WebSocket functions here: https://arc.codes/ws
 
-import YSockets from "./lib/helpers/ysockets.mjs";
+import { YSocketsARC } from "@architect/shared/YSocketsARC.mjs";
 import arc from "@architect/functions";
 
 export async function handler(req) {
-  // console.log(JSON.stringify(req, null, 2));
-
-  let client = await arc.tables();
-  let YConn = await client.YConn;
-  let YData = await client.YData;
-
-  const ysockets = new YSockets({
-    YConn,
-    YData,
-  });
-
+  let ysockets = new YSocketsARC();
   let connectionId = req.requestContext.connectionId;
 
   let send = async (connectionId, message) => {
@@ -28,13 +18,11 @@ export async function handler(req) {
         id: connectionId,
         payload: `${message}`,
       })
-      .catch((r) => {
+      .catch(async (r) => {
         console.error("send error", r);
-
-        ysockets.onDisconnect(connectionId);
+        await ysockets.onDisconnect(connectionId);
       });
   };
-  // console.log(req.body);
 
   await ysockets.onMessage(connectionId, req.body, send);
 

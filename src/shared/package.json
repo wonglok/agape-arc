@@ -14,6 +14,9 @@
     "aws-sdk": "^2.1309.0",
     "ethers": "^6.0.0",
     "jose": "^4.8.1",
-    "uuid": "^9.0.0"
+    "lib0": "latest",
+    "uuid": "latest",
+    "y-protocols": "latest",
+    "yjs": "latest"
   }
 }
