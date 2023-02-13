@@ -80,7 +80,15 @@ export class ConnectionsTableHelper {
     console.log(resultsDeltas.Count, "resultsDeltas");
 
     let dbDoc = {
-      Updates: resultsDeltas.Items.map((r) => r.update),
+      Updates: resultsDeltas.Items.sort((a, b) => {
+        if (a.ts > b.ts) {
+          return -1;
+        }
+        if (a.ts < b.ts) {
+          return 1;
+        }
+        return 0;
+      }).map((r) => r.update),
     };
 
     // convert updates to an encoded array
