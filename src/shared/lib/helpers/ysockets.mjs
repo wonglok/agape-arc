@@ -64,7 +64,7 @@ export class YSockets {
             const update = decoding.readVarUint8Array(decoder);
             Y.applyUpdate(doc, update);
             await broadcast(messageArray);
-            await ct.updateDoc(docName, toBase64(update));
+            await ct.updateDoc(docName, toBase64(update), connectionId);
             break;
           default:
             throw new Error("Unknown message type");

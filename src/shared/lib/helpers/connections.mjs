@@ -1,8 +1,7 @@
 import { DDBHelper } from "../utils/ddb.mjs";
 import * as Y from "yjs";
 import arc from "@architect/functions";
-import { v4 as uuidv4 } from "uuid";
-
+import { toBase64 } from "lib0/buffer.js";
 export class ConnectionsTableHelper {
   constructor({ documentClient, tableName }) {
     this.DatabaseHelper = new DDBHelper({
@@ -59,70 +58,62 @@ export class ConnectionsTableHelper {
     return [];
   }
   async getOrCreateDoc(docName) {
-    // const existingDoc = await this.DatabaseHelper.getItem(docName);
-    // let dbDoc = {
-    //   Updates: [],
-    // };
-    // if (existingDoc) {
-    //   dbDoc = existingDoc;
-    // } else {
-    //   await this.DatabaseHelper.createItem(docName, dbDoc, undefined, true);
-    // }
+    const existingDoc = await this.DatabaseHelper.getItem(docName);
+    let dbDoc = {
+      Updates: [],
+    };
+    if (existingDoc) {
+      dbDoc = existingDoc;
+    } else {
+      await this.DatabaseHelper.createItem(docName, dbDoc, undefined, true);
+    }
+    // convert updates to an encoded array
 
-    let client = await arc.tables();
-    let resultsDeltas = await client.YDeltaTable.scan({
-      FilterExpression: `docName = :dd`,
-      ExpressionAttributeValues: {
-        [":dd"]: docName,
-      },
+    if (dbDoc.Updates.length > 0) {
+      const oldUpdates = dbDoc.Updates.map(
+        (update) => new Uint8Array(Buffer.from(update, "base64"))
+      );
+
+      const mergedUpdate = Y.mergeUpdates(oldUpdates);
+
+      await this.DatabaseHelper.updateItemAttribute(
+        docName,
+        "Updates",
+        [toBase64(mergedUpdate)],
+        undefined
+      );
+
+      dbDoc.Updates = [toBase64(mergedUpdate)];
+    }
+
+    const updates = dbDoc.Updates.map((update) => {
+      return new Uint8Array(Buffer.from(update, "base64"));
     });
 
-    console.log(resultsDeltas.Count, "resultsDeltas");
-
-    let dbDoc = {
-      Updates: resultsDeltas.Items.sort((a, b) => {
-        if (a.ts > b.ts) {
-          return -1;
-        }
-        if (a.ts < b.ts) {
-          return 1;
-        }
-        return 0;
-      }).map((r) => r.update),
-    };
-
-    // convert updates to an encoded array
-    const updates = dbDoc.Updates.map(
-      (update) => new Uint8Array(Buffer.from(update, "base64"))
-    );
     const ydoc = new Y.Doc();
     for (const update of updates) {
       try {
         Y.applyUpdate(ydoc, update);
       } catch (ex) {
-        console.log("Something went wrong with applying the update", ex);
+        console.log("Something went wrong with applying the update");
       }
     }
+
+    // let lengthSize = dbDoc.Updates.join("");
+    // console.log(lengthSize.length);
+
     return ydoc;
   }
   async updateDoc(docName, update) {
-    let client = await arc.tables();
-
-    await client.YDeltaTable.put({
-      oid: uuidv4(),
-      docName: docName,
-      update: update,
-      ts: new Date().getTime(),
-    });
-
     // console.log(update);
-    // return await this.DatabaseHelper.updateItemAttribute(
-    //   docName,
-    //   "Updates",
-    //   [update],
-    //   undefined,
-    //   { appendToList: true }
-    // );
+    return await this.DatabaseHelper.updateItemAttribute(
+      docName,
+      "Updates",
+      [update],
+      undefined,
+      { appendToList: true }
+    );
+
     /*
         Future: Try to compute diffs as one large update
 
