@@ -19,7 +19,7 @@ export async function handler(req) {
   let actionType = bodyData.actionType;
 
   let send = async (connectionId, payload) => {
-    await arc.ws
+    return await arc.ws
       .send({
         id: connectionId,
         payload: payload,
@@ -98,7 +98,7 @@ export async function handler(req) {
     // console.log(conns);
 
     for (let connId of conns) {
-      send(connId, {
+      await send(connId, {
         ...bodyData,
         actionType: "sync",
       });
