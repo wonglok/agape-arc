@@ -66,6 +66,9 @@ YDeltaTable
 YConn
   oid *string
 
+YConnARC
+  oid *string
+
 YData
   oid *string
 

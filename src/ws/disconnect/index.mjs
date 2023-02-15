@@ -1,23 +1,16 @@
-// learn more about WebSocket functions here: https://arc.codes/ws
-
-import YSockets from "@architect/shared/lib/helpers/ysockets.mjs";
 import arc from "@architect/functions";
 
+// learn more about WebSocket functions here: https://arc.codes/ws
 export async function handler(req) {
-  //
-
+  console.log(
+    "disconnect",
+    JSON.stringify(req.requestContext.connectionId, null, 2)
+  );
   let client = await arc.tables();
-  let documentClient = client._doc;
-
-  const ysockets = new YSockets({
-    documentClient,
-    tableName: client.name(`YConnectionsTable`),
-  });
 
   let connectionId = req.requestContext.connectionId;
 
-  await ysockets.onDisconnect(connectionId);
+  await client.YConnARC.delete({ oid: connectionId });
 
-  console.log(JSON.stringify(req, null, 2));
   return { statusCode: 200 };
 }
