@@ -95,14 +95,17 @@ export async function handler(req) {
       .filter((all) => all !== connectionId)
       .map((r) => r.oid);
 
-    console.log(conns);
+    // console.log(conns);
 
-    conns.forEach((connId) => {
+    for (let connId of conns) {
       send(connId, {
         ...bodyData,
         actionType: "sync",
       });
-    });
+    }
+    // conns.forEach((connId) => {
+
+    // });
 
     // console.log(connectionsNoSelf);
     //docName
