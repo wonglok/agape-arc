@@ -68,6 +68,7 @@ export class ConnectionsTableHelper {
     // } else {
     //   await this.DatabaseHelper.createItem(docName, dbDoc, undefined, true);
     // }
+
     let client = await arc.tables();
     let scan = await client.YUpdates.scan({
       FilterExpression: `docName = :dd`,
@@ -90,19 +91,60 @@ export class ConnectionsTableHelper {
         console.log("Something went wrong with applying the update");
       }
     }
+
     return ydoc;
   }
   async updateDoc(docName, update) {
     console.log(update);
 
     let client = await arc.tables();
+
+    let scan = await client.YUpdates.scan({
+      FilterExpression: `docName = :dd`,
+      ExpressionAttributeValues: { [":dd"]: { S: docName } },
+    });
+
+    let updatesOnly = scan.Items.map((r) => {
+      return r.update;
+    });
+
+    // convert updates to an encoded array
+    const updates = updatesOnly.map(
+      (update) => new Uint8Array(Buffer.from(update, "base64"))
+    );
+    const ydoc = new Y.Doc();
+    for (const update of updates) {
+      try {
+        Y.applyUpdate(ydoc, update);
+      } catch (ex) {
+        console.log("Something went wrong with applying the update");
+      }
+    }
+
+    let combinedUpdates = Y.encodeStateAsUpdate(ydoc);
+
+    await Promise.all([
+      ...updatesOnly.map((up) => {
+        return Promise.resolve(up)
+          .then((up) => {
+            return client.YUpdates.delete({ oid: up.oid });
+          })
+          .catch((ex) => {
+            console.error(ex);
+          });
+      }),
+    ]);
+    // .delete({})
+
     let info = await client.YUpdates.scan({});
     let data = await client.YUpdates.put({
       oid: `${docName}-${info.Count}`,
       inc: info.Count,
       docName,
-      update,
+      update: combinedUpdates,
     });
+
+    console.log(data);
 
     // return await this.DatabaseHelper.updateItemAttribute(
     //   docName,
