@@ -145,7 +145,7 @@ export async function handler(req) {
       actionType: "initDown",
       docName,
       update64: fromUint8Array(updateBin),
-      origin: connectionId,
+      origin: "cloud",
     });
   }
 
