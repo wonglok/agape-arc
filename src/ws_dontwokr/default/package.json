@@ -1,0 +1,18 @@
+{
+  "name": "default",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@architect/functions": "^5.3.4",
+    "daemon": "^1.1.0",
+    "uuid": "^9.0.0",
+    "yjs": "^13.5.46"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Wong Lok",
+  "license": "ISC"
+}

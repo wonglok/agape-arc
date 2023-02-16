@@ -360,8 +360,8 @@
     "lib0" "^0.2.42"
 
 "yjs@latest":
-  "integrity" "sha512-9VUNDvb9oJHdYSMdzIpdM/agVm+EEFKRN+843CFqQuq5bo/BP3EAaxofRG9jQut3sqtGQT4A9YdQvOeeAjU6aA=="
-  "resolved" "https://registry.npmjs.org/yjs/-/yjs-13.5.45.tgz"
-  "version" "13.5.45"
+  "integrity" "sha512-KIY4BEWYCm79Sr4JTDvgirXmz3lVZ5n7h6nKlsBYu97f/HDQo+XSoq92RqBiybejF9E/L5Iz+56zZrSfBKZ5DQ=="
+  "resolved" "https://registry.npmjs.org/yjs/-/yjs-13.5.46.tgz"
+  "version" "13.5.46"
   dependencies:
     "lib0" "^0.2.49"
