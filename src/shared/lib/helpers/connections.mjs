@@ -57,28 +57,15 @@ export class ConnectionsTableHelper {
     return [];
   }
   async getOrCreateDoc(docName) {
-    // const existingDoc = await this.DatabaseHelper.getItem(docName);
+    const existingDoc = await this.DatabaseHelper.getItem(docName);
     let dbDoc = {
       Updates: [],
     };
-    // if (existingDoc) {
-    //   dbDoc = existingDoc;
-
-    //   console.log();
-    // } else {
-    //   await this.DatabaseHelper.createItem(docName, dbDoc, undefined, true);
-    // }
-
-    let client = await arc.tables();
-    let scan = await client.YUpdates.scan({
-      FilterExpression: `docName = :dd`,
-      ExpressionAttributeValues: { [":dd"]: { S: docName } },
-    });
-
-    dbDoc.Updates = scan.Items.map((r) => {
-      return r.update;
-    });
-
+    if (existingDoc) {
+      dbDoc = existingDoc;
+    } else {
+      await this.DatabaseHelper.createItem(docName, dbDoc, undefined, true);
+    }
     // convert updates to an encoded array
     const updates = dbDoc.Updates.map(
       (update) => new Uint8Array(Buffer.from(update, "base64"))
@@ -91,77 +78,17 @@ export class ConnectionsTableHelper {
         console.log("Something went wrong with applying the update");
       }
     }
-
     return ydoc;
   }
   async updateDoc(docName, update) {
-    let client = await arc.tables();
-
-    let scan = await client.YUpdates.scan({
-      FilterExpression: `docName = :dd`,
-      ExpressionAttributeValues: { [":dd"]: { S: docName } },
-    });
-
-    let updatesOnly = scan.Items.map((r) => {
-      return r.update;
-    });
-
-    // convert updates to an encoded array
-    const updates = updatesOnly.map(
-      (update) => new Uint8Array(Buffer.from(update, "base64"))
+    console.log(update);
+    return await this.DatabaseHelper.updateItemAttribute(
+      docName,
+      "Updates",
+      [update],
+      undefined,
+      { appendToList: true }
     );
-    const ydoc = new Y.Doc();
-    for (const update of updates) {
-      try {
-        Y.applyUpdate(ydoc, update);
-      } catch (ex) {
-        console.log("Something went wrong with applying the update");
-      }
-    }
-
-    let combinedUpdates = Y.encodeStateAsUpdate(ydoc);
-
-    await Promise.all([
-      ...updatesOnly.map((up) => {
-        return Promise.resolve(up)
-          .then((up) => {
-            return client.YUpdates.delete({ oid: up.oid });
-          })
-          .catch((ex) => {
-            console.error(ex);
-          });
-      }),
-    ]);
-    // .delete({})
-
-    let info = await client.YUpdates.scan({});
-    let data = await client.YUpdates.put({
-      oid: `${docName}-${info.Count}`,
-      inc: info.Count,
-      docName,
-      update: combinedUpdates,
-    });
-
-    info = await client.YUpdates.scan({});
-    data = await client.YUpdates.put({
-      oid: `${docName}-${info.Count}`,
-      inc: info.Count,
-      docName,
-      update: update,
-    });
-
-    //
-
-    console.log(data);
-
-    // return await this.DatabaseHelper.updateItemAttribute(
-    //   docName,
-    //   "Updates",
-    //   [update],
-    //   undefined,
-    //   { appendToList: true }
-    // );
-
     /*
         Future: Try to compute diffs as one large update
 
