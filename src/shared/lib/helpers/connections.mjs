@@ -95,8 +95,6 @@ export class ConnectionsTableHelper {
     return ydoc;
   }
   async updateDoc(docName, update) {
-    console.log(update);
-
     let client = await arc.tables();
 
     let scan = await client.YUpdates.scan({
@@ -143,6 +141,16 @@ export class ConnectionsTableHelper {
       docName,
       update: combinedUpdates,
     });
+
+    info = await client.YUpdates.scan({});
+    data = await client.YUpdates.put({
+      oid: `${docName}-${info.Count}`,
+      inc: info.Count,
+      docName,
+      update: update,
+    });
+
+    //
 
     console.log(data);
 
