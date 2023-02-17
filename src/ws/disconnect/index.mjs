@@ -7,17 +7,17 @@ export async function handler(req) {
   //
 
   let client = await arc.tables();
-  let documentClient = client._doc;
-
-  const ysockets = new YSockets({
-    documentClient,
-    tableName: client.name(`YConnectionsTable`),
-  });
-
   let connectionId = req.requestContext.connectionId;
 
-  await ysockets.onDisconnect(connectionId);
+  await client.YConn.delete({ oid: connectionId });
 
-  console.log(JSON.stringify(req, null, 2));
+  // const ysockets = new YSockets({
+  //   documentClient,
+  //   tableName: client.name(`YConnectionsTable`),
+  // });
+
+  // await ysockets.onDisconnect(connectionId);
+
+  // console.log(JSON.stringify(req, null, 2));
   return { statusCode: 200 };
 }

@@ -6,20 +6,23 @@ import arc from "@architect/functions";
 export async function handler(req) {
   //
 
-  console.log(
-    JSON.stringify(req.queryStringParameters.documentName, null, "  ")
-  );
+  let docName = req.queryStringParameters.docName;
+  let connectionId = req.requestContext.connectionId;
   let client = await arc.tables();
-  let documentClient = client._doc;
 
-  const ysockets = new YSockets({
-    documentClient,
-    tableName: client.name(`YConnectionsTable`),
+  await client.YConn.put({
+    oid: connectionId,
+    docName,
   });
 
-  let docName = req.queryStringParameters.documentName;
-  let connectionId = req.requestContext.connectionId;
-  await ysockets.onConnection(connectionId, docName);
+  // let documentClient = client._doc;
+
+  // const ysockets = new YSockets({
+  //   documentClient,
+  //   tableName: client.name(`YConnectionsTable`),
+  // });
+
+  // await ysockets.onConnection(connectionId, docName);
 
   // // await arc.ws.send({
   // //   id: connectionId,

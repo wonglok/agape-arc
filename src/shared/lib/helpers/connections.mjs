@@ -33,7 +33,7 @@ export class ConnectionsTableHelper {
     try {
       let client = await arc.tables();
       let FilterExpression = "DocName = :docName";
-      let ExpressionAttributeValues = { ":docName": docName };
+      let ExpressionAttributeValues = { ":docName": { S: docName } };
 
       let resultsRaw = await client.YConnectionsTable.scan({
         FilterExpression,
