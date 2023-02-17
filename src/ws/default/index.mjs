@@ -58,12 +58,6 @@ export async function handler(req) {
   }
 
   if (bodyData.action === "operation") {
-    await client.YUpdates.put({
-      oid: v4(),
-      update: bodyData.update,
-      docName: bodyData.docName,
-    });
-
     let otherPlayers = await client.YConn.scan({
       FilterExpression: `docName = :dd`,
       ExpressionAttributeValues: {
@@ -86,15 +80,11 @@ export async function handler(req) {
       }
     }
 
-    //
-    //
-    // let { Items } = await client.YUpdates.scan({
-    //   FilterExpression: `docName = :doc`,
-    //   ExpressionAttributeValues: {
-    //     [":doc"]: { S: docName },
-    //   },
-    // });
-    // //
+    await client.YUpdates.put({
+      oid: v4(),
+      update: bodyData.update,
+      docName: bodyData.docName,
+    });
   }
 
   // console.log(req.body);
