@@ -64,7 +64,6 @@ export async function handler(req) {
         [":dd"]: bodyData.docName,
       },
     });
-
     for (let it of otherPlayers.Items) {
       if (it.oid !== connectionId) {
         try {
@@ -79,6 +78,27 @@ export async function handler(req) {
         }
       }
     }
+
+    //
+
+    let updates = await client.YUpdates.scan({
+      FilterExpression: `docName = :dd`,
+      ExpressionAttributeValues: {
+        [":dd"]: bodyData.docName,
+      },
+    });
+
+    let updatesRaw = [];
+    updates.Items.forEach((item) => {
+      updatesRaw.push(fromBase64(item.update));
+    });
+    let merged = Y.mergeUpdates(updatesRaw);
+
+    await client.YUpdates.put({
+      oid: v4(),
+      update: toBase64(merged),
+      docName: bodyData.docName,
+    });
 
     await client.YUpdates.put({
       oid: v4(),
