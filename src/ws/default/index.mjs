@@ -59,6 +59,12 @@ export async function handler(req) {
   }
 
   if (bodyData.action === "operation") {
+    await client.YUpdates.put({
+      oid: v4(),
+      update: bodyData.update,
+      docName: bodyData.docName,
+    });
+
     let otherPlayers = await client.YConn.scan({
       FilterExpression: `docName = :dd`,
       ExpressionAttributeValues: {
@@ -80,12 +86,6 @@ export async function handler(req) {
         }
       }
     }
-
-    await client.YUpdates.put({
-      oid: v4(),
-      update: bodyData.update,
-      docName: bodyData.docName,
-    });
 
     //
     // let { Items } = await client.YUpdates.scan({
