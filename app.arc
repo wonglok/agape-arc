@@ -57,20 +57,20 @@ AppCode
 ArtProject
   oid *String
 
-YConnectionsTable
-  PartitionKey *string
+# YConnectionsTable
+#   PartitionKey *string
 
-YDeltaTable
-  oid *string
+# YDeltaTable
+#   oid *string
 
-YConn
-  oid *string
+# YConn
+#   oid *string
 
-YConnARC
-  oid *string
+# YConnARC
+#   oid *string
 
-YData
-  oid *string
+# YData
+#   oid *string
 
-YUpdates
-  oid *string
+# YUpdates
+#   oid *string
