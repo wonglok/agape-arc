@@ -9,6 +9,7 @@
 import arc from "@architect/functions";
 import { DynamoDbPersistence, Y } from "@architect/shared/YDyna.mjs";
 import { toBase64, fromBase64 } from "lib0/buffer";
+import { v4 } from "uuid";
 
 export async function handler(req) {
   let bodyData = JSON.parse(req.body);
@@ -31,15 +32,24 @@ export async function handler(req) {
   // console.log(JSON.stringify(req, null, 2));
 
   if (bodyData.action === "init") {
-    const config = {
-      dynamoDBClient: client._db,
-      skipCreateTable: false, // skips creating table, assumes it already exists
-      tableName: "arc-agape-y-dynamodb",
-    };
+    let yDoc = new Y.Doc();
 
-    const persistence = DynamoDbPersistence(config);
+    let updates = await client.YUpdates.scan({
+      FilterExpression: `docName = :dd`,
+      ExpressionAttributeValues: {
+        [":dd"]: bodyData.docName,
+      },
+    });
 
-    let yDoc = await persistence.getYDoc(bodyData.docName);
+    for (let item of updates.Items) {
+      if (item.update) {
+        try {
+          Y.applyUpdate(yDoc, fromBase64(item.update));
+        } catch (ex) {
+          console.error(ex);
+        }
+      }
+    }
 
     await send(connectionId, {
       action: "init",
@@ -49,36 +59,33 @@ export async function handler(req) {
   }
 
   if (bodyData.action === "operation") {
-    const config = {
-      dynamoDBClient: client._db,
-      skipCreateTable: true, // skips creating table, assumes it already exists
-      tableName: "arc-agape-y-dynamodb",
-    };
-
-    const persistence = DynamoDbPersistence(config);
-
-    await persistence.storeUpdate(
-      bodyData.docName,
-      fromBase64(bodyData.update)
-    );
-
-    let others = await client.YConn.scan({
+    let otherPlayers = await client.YConn.scan({
       FilterExpression: `docName = :dd`,
       ExpressionAttributeValues: {
         [":dd"]: bodyData.docName,
       },
     });
 
-    console.log(others.Items);
-    for (let it of others.Items) {
+    for (let it of otherPlayers.Items) {
       if (it.oid !== connectionId) {
-        await send(it.oid, {
-          action: "operation",
-          docName: bodyData.docName,
-          update: bodyData.update,
-        });
+        try {
+          await send(it.oid, {
+            action: "operation",
+            docName: bodyData.docName,
+            update: bodyData.update,
+          });
+        } catch (e) {
+          console.error(e);
+          await client.YConn.delete({ oid: it.oid });
+        }
       }
     }
+
+    await client.YUpdates.put({
+      oid: v4(),
+      update: bodyData.update,
+      docName: bodyData.docName,
+    });
 
     //
     // let { Items } = await client.YUpdates.scan({
