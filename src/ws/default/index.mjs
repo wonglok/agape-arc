@@ -71,6 +71,7 @@ export async function handler(req) {
     updates.Items.forEach((item) => {
       updatesRaw.push(fromBase64(item.update));
     });
+
     let merged = Y.mergeUpdates(updatesRaw);
 
     await client.YUpdates.put({
@@ -84,6 +85,12 @@ export async function handler(req) {
       update: bodyData.update,
       docName: bodyData.docName,
     });
+
+    Promise.all(
+      updates.Items.map((item) => {
+        return client.YUpdates.delete({ oid: item.oid });
+      })
+    );
 
     let otherPlayers = await client.YConn.scan({
       FilterExpression: `docName = :dd`,
