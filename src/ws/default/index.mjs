@@ -32,8 +32,6 @@ export async function handler(req) {
   // console.log(JSON.stringify(req, null, 2));
 
   if (bodyData.action === "init") {
-    let yDoc = new Y.Doc();
-
     let updates = await client.YUpdates.scan({
       FilterExpression: `docName = :dd`,
       ExpressionAttributeValues: {
@@ -41,6 +39,7 @@ export async function handler(req) {
       },
     });
 
+    let yDoc = new Y.Doc();
     for (let item of updates.Items) {
       if (item.update) {
         try {
@@ -87,6 +86,7 @@ export async function handler(req) {
       }
     }
 
+    //
     //
     // let { Items } = await client.YUpdates.scan({
     //   FilterExpression: `docName = :doc`,
