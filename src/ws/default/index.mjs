@@ -58,27 +58,6 @@ export async function handler(req) {
   }
 
   if (bodyData.action === "operation") {
-    let otherPlayers = await client.YConn.scan({
-      FilterExpression: `docName = :dd`,
-      ExpressionAttributeValues: {
-        [":dd"]: bodyData.docName,
-      },
-    });
-    for (let it of otherPlayers.Items) {
-      if (it.oid !== connectionId) {
-        try {
-          await send(it.oid, {
-            action: "operation",
-            docName: bodyData.docName,
-            update: bodyData.update,
-          });
-        } catch (e) {
-          console.error(e);
-          await client.YConn.delete({ oid: it.oid });
-        }
-      }
-    }
-
     //
 
     let updates = await client.YUpdates.scan({
@@ -105,6 +84,27 @@ export async function handler(req) {
       update: bodyData.update,
       docName: bodyData.docName,
     });
+
+    let otherPlayers = await client.YConn.scan({
+      FilterExpression: `docName = :dd`,
+      ExpressionAttributeValues: {
+        [":dd"]: bodyData.docName,
+      },
+    });
+    for (let it of otherPlayers.Items) {
+      if (it.oid !== connectionId) {
+        try {
+          await send(it.oid, {
+            action: "operation",
+            docName: bodyData.docName,
+            update: bodyData.update,
+          });
+        } catch (e) {
+          console.error(e);
+          await client.YConn.delete({ oid: it.oid });
+        }
+      }
+    }
   }
 
   // console.log(req.body);
