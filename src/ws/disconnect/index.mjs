@@ -14,5 +14,6 @@ export async function handler(req) {
       resolve();
     });
   });
+
   return { statusCode: 200 };
 }
