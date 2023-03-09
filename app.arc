@@ -31,6 +31,19 @@ src src/shared
 SocketConnection
   oid *String
 
+GraphDoc
+  oid *String
+
+DocNodes
+  oid *String
+
+DocEdges
+  oid *String
+
+DocJS
+  oid *String
+
+
 # testdata
 #   oid *String
 
