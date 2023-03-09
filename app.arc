@@ -6,6 +6,8 @@ get /
 post /auth-center
 post /app-project
 post /app-version
+post /graph-center
+
 
 post /art-project
 
@@ -38,6 +40,9 @@ DocNodes
   oid *String
 
 DocEdges
+  oid *String
+
+DocAsset
   oid *String
 
 DocJS
