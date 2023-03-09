@@ -7,6 +7,7 @@ import {
   generateKeyPair as joseGenerateKeyPair,
 } from "jose";
 import { v4 } from "uuid";
+import md5 from "md5";
 import { getAddress, verifyMessage as ethersVerifyMessage } from "ethers";
 import { SystemAdmins } from "./SystemAdmins-config.mjs";
 
@@ -50,7 +51,7 @@ export function verifyMessage({ rawMessage, signature }) {
 
 // let yo = 123;
 
-export const getID = () => "_" + v4() + "";
+export const getID = () => "_" + md5(v4() + "") + "";
 
 export const generateKeyPair = async () => {
   const appSecret = await generateSecret("HS256");
