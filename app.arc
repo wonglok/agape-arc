@@ -28,8 +28,12 @@ folder static
 src src/shared
 
 @tables
+SocketConnection
+  oid *String
+
 # testdata
 #   oid *String
+
 SystemMeta
   oid *String
 
