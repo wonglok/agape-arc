@@ -15,6 +15,4 @@ export const SystemAdmins = [
     type: "password",
     userID: "admin",
   },
-
-  //
 ];

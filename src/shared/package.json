@@ -15,6 +15,7 @@
     "ethers": "^6.0.0",
     "jose": "^4.8.1",
     "lib0": "latest",
+    "md5": "^2.3.0",
     "uuid": "latest",
     "y-protocols": "latest",
     "yjs": "latest"

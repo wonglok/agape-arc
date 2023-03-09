@@ -6,10 +6,9 @@ get /
 post /auth-center
 post /app-project
 post /app-version
-post /graph-center
-
 
 post /art-project
+post /material-project
 
 @aws
 profile agape-arc-profile
@@ -31,6 +30,9 @@ src src/shared
 
 @tables
 SocketConnection
+  oid *String
+
+MaterialProject
   oid *String
 
 GraphDoc

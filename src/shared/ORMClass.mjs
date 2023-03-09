@@ -1,6 +1,7 @@
 import { v4 } from "uuid";
 import arc from "@architect/functions";
 import DynamoDB from "aws-sdk/clients/dynamodb.js";
+import md5 from "md5";
 
 let { marshall, unmarshall } = DynamoDB.Converter;
 
@@ -86,7 +87,7 @@ class ORMClass {
   }
 
   getID() {
-    return v4();
+    return "_" + md5(v4() + "") + "";
   }
 }
 
